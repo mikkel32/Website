@@ -1,17 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Site</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 50px; }
-        h1 { color: #2E3A87; }
-        p { font-size: 18px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Site</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Welcome to the Security Site</h1>
+  <button class="theme-toggle">Toggle Theme</button>
+  <header>
+    <h1>Security Site</h1>
+  </header>
+  <section class="hero">
+    <h2>Welcome to the Security Site</h2>
     <p>This page was opened directly from the local file system.</p>
+  </section>
+  <section class="container">
+    <h3>Features</h3>
+    <ul>
+      <li>Local access with Python script</li>
+      <li>Responsive design</li>
+      <li>Dark/Light theme</li>
+    </ul>
+  </section>
+  <footer>
+    <p>&copy; 2025 Security Site</p>
+  </footer>
+
+  <script>
+    const toggleBtn = document.querySelector('.theme-toggle');
+    toggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+  </script>
 </body>
 </html>
