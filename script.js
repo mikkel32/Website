@@ -151,19 +151,30 @@ scrollTopBtn.addEventListener('click', () => {
   });
 });
 
-// Loading Animation (continued)
-window.addEventListener('load', () => {
-  const loader = document.createElement('div');
-  loader.className = 'loading';
-  loader.innerHTML = '<div class="loading-spinner"></div>';
-  document.body.appendChild(loader);
-  
-  setTimeout(() => {
-    loader.style.opacity = '0';
-    setTimeout(() => {
-      loader.remove();
-    }, 300);
-  }, 1000);
+// Initialize features once the DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  const preloader = document.getElementById('preloader');
+  if (preloader) {
+    preloader.classList.add('fade-out');
+    preloader.addEventListener('transitionend', () => preloader.remove());
+    document.body.classList.remove('no-scroll');
+  }
+
+  addSecurityDemo();
+
+  const passwordInput = document.getElementById('passwordInput');
+  const strengthBar = document.getElementById('strengthBar');
+  const strengthText = document.getElementById('strengthText');
+
+  passwordInput.addEventListener('input', (e) => {
+    const password = e.target.value;
+    const strength = checkPasswordStrength(password);
+
+    strengthBar.style.width = `${strength.score * 25}%`;
+    strengthBar.style.backgroundColor = strength.color;
+    strengthText.textContent = strength.text;
+    strengthText.style.color = strength.color;
+  });
 });
 
 // Form Validation (if you add a contact form)
@@ -257,24 +268,7 @@ window.encryptDemo = function() {
   }
 };
 
-// Password strength checker
-document.addEventListener('DOMContentLoaded', () => {
-  addSecurityDemo();
-  
-  const passwordInput = document.getElementById('passwordInput');
-  const strengthBar = document.getElementById('strengthBar');
-  const strengthText = document.getElementById('strengthText');
-  
-  passwordInput.addEventListener('input', (e) => {
-    const password = e.target.value;
-    const strength = checkPasswordStrength(password);
-    
-    strengthBar.style.width = `${strength.score * 25}%`;
-    strengthBar.style.backgroundColor = strength.color;
-    strengthText.textContent = strength.text;
-    strengthText.style.color = strength.color;
-  });
-});
+// Password strength checker logic
 
 function checkPasswordStrength(password) {
   let score = 0;
