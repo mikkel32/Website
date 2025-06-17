@@ -161,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   addSecurityDemo();
+  securityFeatures.init();
 
   const passwordInput = document.getElementById('passwordInput');
   const strengthBar = document.getElementById('strengthBar');
@@ -205,20 +206,36 @@ function validateForm(form) {
 
 // Security Features Demo
 const securityFeatures = {
-  // Simulate real-time threat detection
-  threatDetection: () => {
-    const threats = ['Malware', 'Phishing', 'DDoS', 'SQL Injection', 'XSS'];
-    const randomThreat = threats[Math.floor(Math.random() * threats.length)];
-    console.log(`Threat detected: ${randomThreat} - Blocked successfully`);
+  key: null,
+  async init() {
+    this.key = await crypto.subtle.generateKey(
+      { name: 'AES-GCM', length: 256 },
+      true,
+      ['encrypt', 'decrypt']
+    );
   },
-  
-  // Simulate encryption
-  encrypt: (text) => {
-    return btoa(text); // Simple base64 encoding for demo
+
+  scanInput(text) {
+    const patterns = [/<script/i, /select\b.*from/i, /(\bor\b|\band\b).*=.*\b/];
+    return patterns.some(r => r.test(text));
   },
-  
-  decrypt: (encoded) => {
-    return atob(encoded);
+
+  async encrypt(text) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encoded = new TextEncoder().encode(text);
+    const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, this.key, encoded);
+    const result = new Uint8Array(iv.byteLength + cipher.byteLength);
+    result.set(iv, 0);
+    result.set(new Uint8Array(cipher), iv.byteLength);
+    return btoa(String.fromCharCode(...result));
+  },
+
+  async decrypt(data) {
+    const bytes = Uint8Array.from(atob(data), c => c.charCodeAt(0));
+    const iv = bytes.slice(0, 12);
+    const cipher = bytes.slice(12);
+    const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, this.key, cipher);
+    return new TextDecoder().decode(decrypted);
   }
 };
 
@@ -232,7 +249,7 @@ function addSecurityDemo() {
       <h2 class="section-title">Live Security Demo</h2>
       <div class="demo-grid">
         <div class="demo-card">
-          <h3>Encryption Demo</h3>
+          <h3>AES-GCM Encryption Demo</h3>
           <input type="text" id="encryptInput" placeholder="Enter text to encrypt">
           <button class="btn btn-primary" onclick="encryptDemo()">Encrypt</button>
           <div class="demo-result" id="encryptResult"></div>
@@ -254,15 +271,19 @@ function addSecurityDemo() {
 }
 
 // Encryption demo function
-window.encryptDemo = function() {
+window.encryptDemo = async function() {
   const input = document.getElementById('encryptInput');
   const result = document.getElementById('encryptResult');
-  
+
   if (input.value) {
-    const encrypted = securityFeatures.encrypt(input.value);
+    if (securityFeatures.scanInput(input.value)) {
+      notifications.show('Potentially malicious input detected', 'warning');
+    }
+    const encrypted = await securityFeatures.encrypt(input.value);
+    const decrypted = await securityFeatures.decrypt(encrypted);
     result.innerHTML = `
       <p><strong>Encrypted:</strong> ${encrypted}</p>
-      <p><strong>Decrypted:</strong> ${securityFeatures.decrypt(encrypted)}</p>
+      <p><strong>Decrypted:</strong> ${decrypted}</p>
     `;
     result.style.display = 'block';
   }
