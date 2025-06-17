@@ -1,5 +1,5 @@
 import React from 'https://cdn.jsdelivr.net/npm/react@18.2.0/+esm'
-import ReactDOM from 'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/+esm'
+import { createRoot } from 'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/client/+esm'
 // Use a stable CDN URL for React Router DOM. The previous version-specific
 // path resulted in a 404 when the requested version was not available. Using
 // the ``@6`` tag ensures we always get the latest 6.x build with the UMD
@@ -142,6 +142,6 @@ function App() {
 }
 
 const rootEl = document.getElementById('root')
-ReactDOM.createRoot(rootEl).render(
+createRoot(rootEl).render(
   e(AuthProvider, null, e(App))
 )
