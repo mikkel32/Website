@@ -3,12 +3,16 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from email_validator import validate_email, EmailNotValidError
-from src.models.user import db, User, LoginAttempt, Session
+# Updated import path to match project structure
+from user import db, User, LoginAttempt, Session
 from datetime import datetime, timezone, timedelta
 import secrets
 import re
 
 auth_bp = Blueprint('auth', __name__)
+
+# Rate limiting for authentication endpoints
+limiter = Limiter(key_func=get_remote_address)
 
 # Password strength validation
 def validate_password_strength(password):
@@ -48,6 +52,7 @@ def log_login_attempt(username, success, user_id=None):
     db.session.commit()
 
 @auth_bp.route('/register', methods=['POST'])
+@limiter.limit('5/minute')
 def register():
     """Register a new user with comprehensive validation."""
     try:
@@ -110,6 +115,7 @@ def register():
         return jsonify({"error": "Registration failed", "details": str(e)}), 500
 
 @auth_bp.route('/login', methods=['POST'])
+@limiter.limit('10/minute')
 def login():
     """Authenticate user with comprehensive security checks."""
     try:
@@ -172,7 +178,7 @@ def login():
         
         # Create JWT token
         access_token = create_access_token(
-            identity=user.id,
+            identity=str(user.id),
             additional_claims={
                 'username': user.username,
                 'session_token': session_token
@@ -197,7 +203,7 @@ def login():
 def logout():
     """Logout user and invalidate session."""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         claims = get_jwt()
         session_token = claims.get('session_token')
         
@@ -222,7 +228,7 @@ def logout():
 def verify_token():
     """Verify if the current token is valid and session is active."""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         claims = get_jwt()
         session_token = claims.get('session_token')
         
@@ -257,7 +263,7 @@ def verify_token():
 def change_password():
     """Change user password with security validation."""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         data = request.get_json()
         
         if not data:
