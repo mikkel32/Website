@@ -92,7 +92,7 @@ export function AuthProvider({ children }) {
     dispatch({ type: 'SET_LOADING', payload: false });
   };
 
-  const login = async (username, password) => {
+  const login = React.useCallback(async (username, password) => {
     dispatch({ type: 'LOGIN_START' });
     const { ok, data } = await apiRequest('/auth/login', {
       method: 'POST',
@@ -105,9 +105,9 @@ export function AuthProvider({ children }) {
     }
     dispatch({ type: 'LOGIN_FAILURE', payload: data.error });
     return { success: false, error: data.error };
-  };
+  }, []);
 
-  const register = async (username, email, password) => {
+  const register = React.useCallback(async (username, email, password) => {
     dispatch({ type: 'LOGIN_START' });
     const { ok, data } = await apiRequest('/auth/register', {
       method: 'POST',
@@ -118,15 +118,15 @@ export function AuthProvider({ children }) {
     }
     dispatch({ type: 'LOGIN_FAILURE', payload: data.error });
     return { success: false, error: data.error };
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = React.useCallback(async () => {
     await apiRequest('/auth/logout', { method: 'POST' });
     localStorage.removeItem('auth_token');
     dispatch({ type: 'LOGOUT' });
-  };
+  }, []);
 
-  const changePassword = async (currentPassword, newPassword) => {
+  const changePassword = React.useCallback(async (currentPassword, newPassword) => {
     const { ok, data } = await apiRequest('/auth/change-password', {
       method: 'POST',
       body: JSON.stringify({
@@ -138,25 +138,28 @@ export function AuthProvider({ children }) {
       return { success: true, data };
     }
     return { success: false, error: data.error };
-  };
+  }, []);
 
-  const clearError = () => {
+  const clearError = React.useCallback(() => {
     dispatch({ type: 'CLEAR_ERROR' });
-  };
+  }, []);
 
-  const value = {
-    ...state,
-    login,
-    register,
-    logout,
-    changePassword,
-    clearError
-  };
+  const value = React.useMemo(
+    () => ({
+      ...state,
+      login,
+      register,
+      logout,
+      changePassword,
+      clearError
+    }),
+    [state, login, register, logout, changePassword, clearError]
+  );
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
+  return React.createElement(
+    AuthContext.Provider,
+    { value },
+    children
   );
 }
 
