@@ -21,7 +21,6 @@ jobs:
       - name: Merge PR if possible
         uses: actions/github-script@v7
         with:
-          github-token: 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
           script: |
             const { owner, repo } = context.repo
             let   pr              // <-- will be updated while polling
