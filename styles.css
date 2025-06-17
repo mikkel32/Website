@@ -27,6 +27,11 @@ body {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
+.no-scroll {
+  height: 100vh;
+  overflow: hidden;
+}
+
 /* Navigation */
 .navbar {
   position: fixed;
@@ -570,7 +575,7 @@ body.dark-mode footer {
 }
 
 /* Loading Animation */
-.loading {
+#preloader {
   position: fixed;
   top: 0;
   left: 0;
@@ -581,6 +586,13 @@ body.dark-mode footer {
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+#preloader.fade-out {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .loading-spinner {
