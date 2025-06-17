@@ -4,10 +4,16 @@ import ReactDOM from 'https://cdn.jsdelivr.net/npm/react-dom@18.2.0/+esm'
 // path resulted in a 404 when the requested version was not available. Using
 // the ``@6`` tag ensures we always get the latest 6.x build with the UMD
 // bundle present.
-import ReactRouterDOM from 'https://cdn.jsdelivr.net/npm/react-router-dom@6/+esm'
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useNavigate
+} from 'https://cdn.jsdelivr.net/npm/react-router-dom@6/+esm'
 import { AuthProvider, useAuth } from './AuthContext.js'
 
-const { BrowserRouter, Routes, Route, Link, Navigate, useNavigate } = ReactRouterDOM
 const e = React.createElement
 
 function LoginForm() {
