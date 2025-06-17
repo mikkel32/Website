@@ -1,4 +1,9 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect
+} from 'https://cdn.jsdelivr.net/npm/react@18.2.0/+esm'
 
 const AuthContext = createContext();
 
