@@ -1,0 +1,10 @@
+2025-06-17 08:27:36,732 - main - INFO - Default admin user created: admin / SecureVault2025!
+2025-06-17 08:27:49,569 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://169.254.0.21:5000
+2025-06-17 08:27:49,569 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-06-17 08:28:23,711 - werkzeug - INFO - 127.0.0.1 - - [17/Jun/2025 08:28:23] "GET /api/health HTTP/1.1" 200 -
+2025-06-17 08:28:23,844 - werkzeug - INFO - 127.0.0.1 - - [17/Jun/2025 08:28:23] "GET /favicon.ico HTTP/1.1" 200 -
+2025-06-17 08:28:30,060 - werkzeug - INFO - 127.0.0.1 - - [17/Jun/2025 08:28:30] "GET /api/security-info HTTP/1.1" 200 -
+2025-06-17 08:28:30,096 - werkzeug - INFO - 127.0.0.1 - - [17/Jun/2025 08:28:30] "GET /favicon.ico HTTP/1.1" 200 -
