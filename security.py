@@ -76,9 +76,9 @@ def compile_scss() -> None:
 
     if npx_cmd is None and pysass is None:
         print(
-            "Failed to compile SCSS: Node.js with npx was not found and the \"
-            "sass\" Python package is unavailable. Install Node.js from "
-            "https://nodejs.org/ or manually install a prebuilt \"sass\" wheel."
+            "Failed to compile SCSS: Node.js with npx was not found and the "
+            '"sass" Python package is unavailable. Install Node.js from '
+            'https://nodejs.org/ or manually install a prebuilt "sass" wheel.'
         )
 
 
