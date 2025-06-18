@@ -57,4 +57,19 @@ npm run dev
 - `security-demo.js` – dynamic demo section with cryptography utilities
 - `tests/` – Jest unit tests for utilities and security features
 
+## Diagnostics dashboard
+
+The optional `dashboard.html` page visualizes logs captured by
+`error-capture.js`. Console errors, warnings and fetch requests are stored in
+`localStorage` under the `sgLogs` key. Resource loading issues such as failed
+images or scripts are also tracked by listening for window `'error'` events in
+the capturing phase. When a resource fails to load a log entry is created with a
+message like:
+
+```
+Resource failed to load: <URL>
+```
+
+Opening the dashboard page will display these entries alongside other logs.
+
 

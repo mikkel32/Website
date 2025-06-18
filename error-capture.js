@@ -54,10 +54,19 @@ console.log = (...args) => {
   origLog.apply(console, args);
 };
 
-window.addEventListener('error', (e) => {
-  const msg = e.message || (e.error && e.error.message) || 'Unknown error';
-  pushLog({ type: 'error', message: msg });
-});
+window.addEventListener(
+  'error',
+  (e) => {
+    if (e.target && (e.target.src || e.target.href)) {
+      const url = e.target.src || e.target.href;
+      pushLog({ type: 'error', message: `Resource failed to load: ${url}` });
+      return;
+    }
+    const msg = e.message || (e.error && e.error.message) || 'Unknown error';
+    pushLog({ type: 'error', message: msg });
+  },
+  true,
+);
 
 window.addEventListener('unhandledrejection', (e) => {
   const reason = e.reason && e.reason.message ? e.reason.message : e.reason;
