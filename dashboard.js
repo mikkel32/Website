@@ -12,11 +12,24 @@ export function initDashboard(options = {}) {
   const autoScrollBox =
     document.querySelector(options.autoScrollEl || '#autoScroll');
   const clearButton = document.querySelector(options.clearBtnEl || '#clearLogs');
+  const filterSelect = document.querySelector(options.filterSelectEl || '#logFilter');
+
+  let logFilter = filterSelect ? filterSelect.value : 'all';
 
   let autoScroll = !autoScrollBox || autoScrollBox.checked;
   if (autoScrollBox) {
     autoScrollBox.addEventListener('change', () => {
       autoScroll = autoScrollBox.checked;
+    });
+  }
+
+  if (filterSelect) {
+    filterSelect.addEventListener('change', () => {
+      logFilter = filterSelect.value;
+      Array.from(logList.children).forEach((li) => {
+        li.style.display =
+          logFilter === 'all' || li.dataset.type === logFilter ? '' : 'none';
+      });
     });
   }
 
@@ -42,8 +55,12 @@ export function initDashboard(options = {}) {
   const appendLog = (type, message) => {
     const li = document.createElement('li');
     li.className = `log-${type}`;
+    li.dataset.type = type;
     const timestamp = new Date().toLocaleTimeString();
     li.innerHTML = `<span class="log-timestamp">${timestamp}</span> ${message}`;
+    if (logFilter !== 'all' && logFilter !== type) {
+      li.style.display = 'none';
+    }
     logList.appendChild(li);
     if (autoScroll) {
       logList.scrollTop = logList.scrollHeight;

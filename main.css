@@ -899,6 +899,14 @@ body.dark-mode .demo-card {
   align-items: center;
 }
 
+.log-filter {
+  padding: 0.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-color);
+ }
+
 .btn-small {
   padding: 0.25rem 0.75rem;
   font-size: 0.875rem;
