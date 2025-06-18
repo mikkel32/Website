@@ -1,6 +1,8 @@
 export function initDashboard(options = {}) {
   const logList = document.getElementById('dashboardLogs');
   const fetchTree = document.getElementById('fetchLogs');
+  const logsEmpty = document.getElementById('logsEmpty');
+  const fetchEmpty = document.getElementById('fetchEmpty');
   if (!logList || !fetchTree) return;
 
   let errors = 0;
@@ -17,6 +19,13 @@ export function initDashboard(options = {}) {
   const filterSelect = document.querySelector(options.filterSelectEl || '#logFilter');
   const searchInput = document.querySelector(options.searchInputEl || '#logSearch');
   const panelToggles = document.querySelectorAll(options.panelToggleSel || '.panel-toggle');
+
+  const updateEmptyStates = () => {
+    if (logsEmpty) logsEmpty.style.display = logList.children.length ? 'none' : 'block';
+    if (fetchEmpty) fetchEmpty.style.display = fetchTree.children.length ? 'none' : 'block';
+  };
+
+  updateEmptyStates();
 
   let logFilter = filterSelect ? filterSelect.value : 'all';
 
@@ -64,7 +73,7 @@ export function initDashboard(options = {}) {
     const panel = btn.closest('.dashboard-panel');
     if (!panel) return;
     const id = panel.id;
-    if (id && localStorage.getItem(`panel-${id}`) === 'collapsed') {
+    if (id && sessionStorage.getItem(`panel-${id}`) === 'collapsed') {
       panel.classList.add('collapsed');
       btn.textContent = 'Expand';
     }
@@ -72,7 +81,7 @@ export function initDashboard(options = {}) {
       const collapsed = panel.classList.toggle('collapsed');
       btn.textContent = collapsed ? 'Expand' : 'Collapse';
       if (id) {
-        localStorage.setItem(`panel-${id}`, collapsed ? 'collapsed' : 'open');
+        sessionStorage.setItem(`panel-${id}`, collapsed ? 'collapsed' : 'open');
       }
     });
   });
@@ -107,6 +116,7 @@ export function initDashboard(options = {}) {
       fetchHistory.length = 0;
       localStorage.removeItem('sgLogs');
       report();
+      updateEmptyStates();
     });
   }
 
@@ -121,6 +131,7 @@ export function initDashboard(options = {}) {
     logList.appendChild(li);
     logHistory.push({ type, message, timestamp });
     updateVisibility();
+    updateEmptyStates();
     if (autoScroll) {
       logList.scrollTop = logList.scrollHeight;
     }
@@ -152,6 +163,7 @@ export function initDashboard(options = {}) {
       failures += 1;
     }
     fetchHistory.push(entry);
+    updateEmptyStates();
   };
 
   const stored = (() => {
@@ -175,6 +187,7 @@ export function initDashboard(options = {}) {
     ['success', 'failure'].forEach((t) => {
       (stored.fetches[t] || []).forEach((f) => addFetchEntry(f));
     });
+    updateEmptyStates();
   }
   if (stored) {
     report();
