@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
     "lint": "npm run lint:js && npm run lint:css",
-    "lint:js": "eslint *.js",
+    "lint:js": "eslint --no-error-on-unmatched-pattern *.js src/**/*.js tests/**/*.js",
     "lint:css": "stylelint \"**/*.{css,scss}\"",
     "dev": "vite",
     "build": "vite build",
