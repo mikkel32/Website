@@ -20,6 +20,27 @@ except Exception:  # ImportError or other issues
 
 ROOT_DIR = Path(__file__).parent
 
+
+def _ensure_node_deps() -> None:
+    """Install Node dependencies if ``animejs`` is missing."""
+    anime_path = ROOT_DIR / "node_modules" / "animejs" / "lib" / "anime.esm.js"
+    if anime_path.exists():
+        return
+
+    npm_cmd = shutil.which("npm") or shutil.which("npm.cmd")
+    if not npm_cmd:
+        print(
+            "Anime.js dependency missing and npm not found. "
+            "Install Node.js and run 'npm install' manually."
+        )
+        return
+
+    print("Node dependencies missing; running 'npm install'...")
+    try:
+        subprocess.run([npm_cmd, "install"], check=True)
+    except subprocess.CalledProcessError as exc:
+        print("Failed to install npm dependencies:", exc)
+
 def _install_python_sass() -> bool:
     """Attempt to install the python ``sass`` module via pip without building."""
     try:
@@ -112,6 +133,7 @@ def _find_free_port(start: int = 8000) -> int:
 
 
 def main() -> None:
+    _ensure_node_deps()
     compile_scss()
     port = _find_free_port()
     handler = partial(SimpleHTTPRequestHandler, directory=ROOT_DIR)
