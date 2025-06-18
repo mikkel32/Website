@@ -1,5 +1,10 @@
 import { JSDOM } from 'jsdom';
-import { validateForm, checkPasswordStrength } from '../utils.js';
+import {
+  validateForm,
+  checkPasswordStrength,
+  getCSRFToken,
+  validateCSRFToken,
+} from '../utils.js';
 
 describe('validateForm', () => {
   test('valid form returns true', () => {
@@ -36,5 +41,14 @@ describe('checkPasswordStrength', () => {
     const result = checkPasswordStrength('abc');
     expect(result.score).toBe(0);
     expect(result.suggestions.length).toBeGreaterThan(0);
+  });
+});
+
+describe('CSRF helpers', () => {
+  test('generate and validate token', () => {
+    sessionStorage.clear();
+    const token = getCSRFToken();
+    expect(validateCSRFToken(token)).toBe(true);
+    expect(validateCSRFToken('bad')).toBe(false);
   });
 });

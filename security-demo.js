@@ -12,8 +12,26 @@ export const securityFeatures = {
   },
 
   scanInput(text) {
-    const patterns = [/<script/i, /select\b.*from/i, /(\bor\b|\band\b).*=.*\b/];
+    const patterns = [
+      /<script/i,
+      /select\b.*from/i,
+      /(\bor\b|\band\b).*=.*\b/,
+      /drop\s+table/i,
+      /insert\s+into/i,
+      /delete\s+from/i,
+      /update\s+\w+\s+set/i,
+      /onerror\s*=\s*/i,
+      /javascript:/i,
+    ];
     return patterns.some((r) => r.test(text));
+  },
+
+  async hash(text, algorithm = 'SHA-256') {
+    const encoded = new TextEncoder().encode(text);
+    const digest = await crypto.subtle.digest(algorithm, encoded);
+    return Array.from(new Uint8Array(digest))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
   },
 
   async encrypt(text) {
@@ -58,6 +76,12 @@ function addSecurityDemo() {
           <div class="strength-text" id="strengthText"></div>
           <ul class="strength-suggestions" id="strengthSuggestions"></ul>
         </div>
+        <div class="demo-card">
+          <h3>SHA-256 Hash Demo</h3>
+          <input type="text" id="hashInput" placeholder="Enter text to hash">
+          <button class="btn btn-primary" id="hashButton">Hash</button>
+          <div class="demo-result" id="hashResult"></div>
+        </div>
       </div>
     </div>
   `;
@@ -96,6 +120,9 @@ export async function setupSecurityDemo(notifications) {
   const encryptButton = document.getElementById('encryptButton');
   const encryptInput = document.getElementById('encryptInput');
   const encryptResult = document.getElementById('encryptResult');
+  const hashButton = document.getElementById('hashButton');
+  const hashInput = document.getElementById('hashInput');
+  const hashResult = document.getElementById('hashResult');
 
   encryptButton.addEventListener('click', async () => {
     if (!encryptInput.value) return;
@@ -112,5 +139,17 @@ export async function setupSecurityDemo(notifications) {
       <p><strong>Decrypted:</strong> ${DOMPurify.sanitize(decrypted)}</p>
     `;
     encryptResult.style.display = 'block';
+  });
+
+  hashButton.addEventListener('click', async () => {
+    if (!hashInput.value) return;
+
+    if (securityFeatures.scanInput(hashInput.value)) {
+      notifications.show('Potentially malicious input detected', 'warning');
+    }
+
+    const digest = await securityFeatures.hash(hashInput.value);
+    hashResult.innerHTML = `<p><strong>SHA-256:</strong> ${digest}</p>`;
+    hashResult.style.display = 'block';
   });
 }

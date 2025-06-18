@@ -63,3 +63,17 @@ export function checkPasswordStrength(password) {
 
   return { ...(strengths[score] || strengths[0]), suggestions };
 }
+
+export function getCSRFToken() {
+  let token = sessionStorage.getItem('csrfToken');
+  if (!token) {
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    token = btoa(String.fromCharCode(...bytes));
+    sessionStorage.setItem('csrfToken', token);
+  }
+  return token;
+}
+
+export function validateCSRFToken(token) {
+  return token === sessionStorage.getItem('csrfToken');
+}

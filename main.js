@@ -3,7 +3,7 @@ import { initTheme, initNavigation } from './theme.js';
 import { initSearch } from './search.js';
 import { NotificationSystem, initNotificationToggle } from './notifications.js';
 import { setupSecurityDemo, securityFeatures } from './security-demo.js';
-import { validateForm } from './utils.js';
+import { validateForm, getCSRFToken, validateCSRFToken } from './utils.js';
 import { initHeroAnimations } from './hero-animations.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -100,6 +100,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const contactForm = document.getElementById('contactForm');
   if (contactForm) {
+    const tokenInput = document.createElement('input');
+    tokenInput.type = 'hidden';
+    tokenInput.name = 'csrf_token';
+    tokenInput.value = getCSRFToken();
+    contactForm.appendChild(tokenInput);
+
     contactForm.addEventListener('submit', (e) => {
       e.preventDefault();
       if (validateForm(contactForm)) {
@@ -108,7 +114,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           notifications.show('Potentially malicious input detected', 'error');
           return;
         }
+        if (!validateCSRFToken(tokenInput.value)) {
+          notifications.show('Invalid session token', 'error');
+          return;
+        }
         notifications.show('Message sent!', 'success');
+        tokenInput.value = getCSRFToken();
         contactForm.reset();
       } else {
         notifications.show('Please fill out all required fields.', 'error');
