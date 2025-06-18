@@ -60,12 +60,30 @@ def sanitize_text(text: str) -> str:
     return html.escape(text, quote=True)
 
 
+class RateLimiter:
+    """Track request counts per IP within a sliding time window."""
+
+    def __init__(self, limit: int, window: int) -> None:
+        self.limit = limit
+        self.window = window
+        self._requests: dict[str, deque] = defaultdict(deque)
+
+    def exceeded(self, ip: str) -> bool:
+        now = time.time()
+        q = self._requests[ip]
+        q.append(now)
+        while q and now - q[0] > self.window:
+            q.popleft()
+        return len(q) > self.limit
+
+
 class SecureHandler(SimpleHTTPRequestHandler):
     """HTTP handler that injects security headers for every response."""
 
-    RATE_LIMIT = 5
-    WINDOW = 1  # seconds
-    _requests: dict[str, deque] = defaultdict(deque)
+    rate_limiter = RateLimiter(
+        int(os.environ.get("MAX_REQUESTS", "5")),
+        int(os.environ.get("RATE_WINDOW", "1")),
+    )
 
     def end_headers(self) -> None:  # type: ignore[override]
         self.send_header(
@@ -86,15 +104,9 @@ class SecureHandler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def _check_rate_limit(self) -> bool:
-        ip = self.client_address[0]
-        now = time.time()
-        q = self._requests[ip]
-        q.append(now)
-        while q and now - q[0] > self.WINDOW:
-            q.popleft()
-        if len(q) > self.RATE_LIMIT:
+        if self.rate_limiter.exceeded(self.client_address[0]):
             self.send_response(429)
-            self.send_header("Retry-After", str(self.WINDOW))
+            self.send_header("Retry-After", str(self.rate_limiter.window))
             self.end_headers()
             self.wfile.write(b"Too Many Requests")
             return True
@@ -285,6 +297,9 @@ def _find_free_port(start: int = 8000) -> int:
 def main() -> None:
     _ensure_node_deps()
     compile_scss()
+    limit = int(os.environ.get("MAX_REQUESTS", "5"))
+    window = int(os.environ.get("RATE_WINDOW", "1"))
+    SecureHandler.rate_limiter = RateLimiter(limit, window)
     port = int(os.environ.get("PORT", _find_free_port()))
     handler = partial(SecureHandler, directory=ROOT_DIR)
     with ThreadingHTTPServer(("localhost", port), handler) as httpd:
