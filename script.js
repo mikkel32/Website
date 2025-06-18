@@ -164,10 +164,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('searchInput');
   const searchResults = document.getElementById('searchResults');
   let searchIndex = [];
+  const searchButton = document.querySelector('.search-toggle');
+  const searchClose = document.querySelector('.search-close');
 
   function openSearch() {
     searchOverlay.classList.add('active');
     searchOverlay.setAttribute('aria-hidden', 'false');
+    if (searchButton) {
+      searchButton.setAttribute('aria-expanded', 'true');
+    }
     searchInput.value = '';
     searchResults.innerHTML = '';
     searchInput.focus();
@@ -177,7 +182,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeSearch() {
     searchOverlay.classList.remove('active');
     searchOverlay.setAttribute('aria-hidden', 'true');
+    if (searchButton) {
+      searchButton.setAttribute('aria-expanded', 'false');
+    }
     document.body.classList.remove('no-scroll');
+  }
+
+  if (searchButton) {
+    searchButton.addEventListener('click', openSearch);
+  }
+  if (searchClose) {
+    searchClose.addEventListener('click', closeSearch);
   }
 
   const notificationToggle = document.querySelector('.notification-toggle');
