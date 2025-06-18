@@ -1,19 +1,15 @@
 name: Auto-merge when ready
 
 on:
-  pull_request_target:            # runs with write perms even for forks
+  pull_request_target:
     types: [opened, synchronize, reopened]
-  check_suite:                    # fires again when CI completes
+  check_suite:
     types: [completed]
 
 jobs:
   automerge:
-    # skip drafts
-    if: |
-      (!github.event.pull_request || github.event.pull_request.draft == false)
-    runs-on: self-hosted
-    container:
-      image: node:20
+    if: ${{ !github.event.pull_request || github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
 
     permissions:
       contents: write
@@ -24,18 +20,16 @@ jobs:
       - name: Merge PR if possible
         uses: actions/github-script@v7
         with:
-          # use the token provided by GitHub to avoid missing secret errors
           github-token: ${{ github.token }}
           script: |
             const { owner, repo } = context.repo;
-            let   pr;
-            let   pull_number;
+            let pr;
+            let pull_number;
 
-            // ---------------- identify the PR ----------------
             if (context.eventName === 'pull_request_target') {
               pr = context.payload.pull_request;
               pull_number = pr.number;
-            } else {                               // check_suite
+            } else {
               const prs = context.payload.check_suite.pull_requests;
               if (!prs || prs.length === 0) {
                 core.info('check_suite completed but has no related PR – exit');
@@ -47,7 +41,6 @@ jobs:
 
             core.info(`▶ Evaluating PR #${pull_number} (${pr.head.ref} → ${pr.base.ref})`);
 
-            // ---------------- wait until mergeability is known ----------------
             let attempts = 0;
             while (pr.mergeable_state === 'unknown' && attempts < 10) {
               await new Promise(r => setTimeout(r, 3000));
@@ -56,7 +49,6 @@ jobs:
             }
             core.info(`mergeable_state = ${pr.mergeable_state}`);
 
-            // ---------------- handle each state ----------------
             if (pr.mergeable_state === 'behind') {
               core.info('Branch behind base – updating branch …');
               await github.rest.pulls.updateBranch({ owner, repo, pull_number });
@@ -68,7 +60,7 @@ jobs:
                 owner,
                 repo,
                 pull_number,
-                merge_method: 'merge'        // change to 'squash' if preferred
+                merge_method: 'merge'
               });
               core.info('✅ PR merged');
               return;
