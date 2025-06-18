@@ -5,7 +5,12 @@ This project showcases an interactive security themed landing page built with mo
 ## Running locally
 
 The simplest way to view the site is via the included Python server.
-It automatically compiles the SCSS styles to `main.css` on startup:
+It automatically compiles the SCSS styles to `main.css` on startup.
+Compilation uses the Node `sass` binary via `npx` if available, falling back to
+the Python `sass` package when installed:
+
+Ensure you have Node.js installed or run `pip install sass` to enable the
+fallback compiler.
 
 ```bash
 python security.py

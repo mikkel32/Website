@@ -10,21 +10,43 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import socket
 from pathlib import Path
 import subprocess
+import shutil
+
+try:
+    import sass as pysass  # type: ignore
+except Exception:  # ImportError or other issues
+    pysass = None
 
 ROOT_DIR = Path(__file__).parent
 
 
 def compile_scss() -> None:
-    """Compile SCSS sources to CSS using the local sass binary."""
+    """Compile SCSS sources to CSS using either Node or the Python sass lib."""
     scss = ROOT_DIR / "src" / "styles" / "main.scss"
     css = ROOT_DIR / "main.css"
-    try:
-        subprocess.run(
-            ["npx", "--yes", "sass", scss.as_posix(), css.as_posix()],
-            check=True,
-        )
-    except (OSError, subprocess.CalledProcessError) as exc:
-        print("Failed to compile SCSS:", exc)
+
+    npx_cmd = shutil.which("npx") or shutil.which("npx.cmd")
+    if npx_cmd:
+        try:
+            subprocess.run(
+                [npx_cmd, "--yes", "sass", scss.as_posix(), css.as_posix()],
+                check=True,
+            )
+            return
+        except subprocess.CalledProcessError as exc:
+            print("Failed to compile SCSS with npx:", exc)
+    else:
+        print("npx not found; attempting to use python sass module")
+
+    if pysass is not None:
+        try:
+            css.write_text(pysass.compile(filename=scss.as_posix()))
+            return
+        except Exception as exc:  # pylint: disable=broad-except
+            print("Failed to compile SCSS with python sass:", exc)
+
+    if npx_cmd is None and pysass is None:
+        print("Failed to compile SCSS: npx command and python sass module missing")
 
 
 def _find_free_port(start: int = 8000) -> int:
