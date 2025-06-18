@@ -153,6 +153,22 @@ export function initDashboard(options = {}) {
     origLog.apply(console, args);
   };
 
+  window.addEventListener('error', (e) => {
+    if (!recording) return;
+    const msg = e.message || (e.error && e.error.message) || 'Unknown error';
+    appendLog('error', msg);
+    errors += 1;
+    report();
+  });
+
+  window.addEventListener('unhandledrejection', (e) => {
+    if (!recording) return;
+    const reason = e.reason && e.reason.message ? e.reason.message : e.reason;
+    appendLog('error', reason || 'Unhandled rejection');
+    errors += 1;
+    report();
+  });
+
   const origFetch = window.fetch;
   window.fetch = async (...args) => {
     const url = args[0];
