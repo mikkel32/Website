@@ -189,6 +189,39 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Build search index from sections
+  searchIndex = Array.from(document.querySelectorAll('section[id]')).map(sec => ({
+    id: sec.id,
+    title: sec.querySelector('h1, h2, h3')?.textContent || sec.id,
+    text: sec.textContent.toLowerCase()
+  }));
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim().toLowerCase();
+    searchResults.innerHTML = '';
+    if (!query) return;
+    const matches = searchIndex.filter(item =>
+      item.title.toLowerCase().includes(query) || item.text.includes(query)
+    );
+    matches.forEach(item => {
+      const li = document.createElement('li');
+      li.innerHTML = `<a href="#${item.id}" data-close-search>${item.title}</a>`;
+      searchResults.appendChild(li);
+    });
+  });
+
+  searchResults.addEventListener('click', (e) => {
+    if (e.target.matches('[data-close-search]')) {
+      closeSearch();
+    }
+  });
+
+  searchOverlay.addEventListener('click', (e) => {
+    if (e.target === searchOverlay) {
+      closeSearch();
+    }
+  });
 });
 
 // Form Validation (if you add a contact form)
@@ -371,6 +404,27 @@ class NotificationSystem {
 
 const notifications = new NotificationSystem();
 
+// Search Overlay Elements
+const searchOverlay = document.getElementById('searchOverlay');
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+let searchIndex = [];
+
+function openSearch() {
+  searchOverlay.classList.add('active');
+  searchOverlay.setAttribute('aria-hidden', 'false');
+  searchInput.value = '';
+  searchResults.innerHTML = '';
+  searchInput.focus();
+  document.body.classList.add('no-scroll');
+}
+
+function closeSearch() {
+  searchOverlay.classList.remove('active');
+  searchOverlay.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('no-scroll');
+}
+
 // Simulate security alerts
 setInterval(() => {
   if (Math.random() > 0.8) {
@@ -383,12 +437,18 @@ document.addEventListener('keydown', (e) => {
   // Ctrl/Cmd + K for search
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault();
-    // Add search functionality here
+    openSearch();
   }
-  
+
   // Escape to close mobile menu
-  if (e.key === 'Escape' && navMenu.classList.contains('active')) {
-    navMenu.classList.remove('active');
+  if (e.key === 'Escape') {
+    if (searchOverlay.classList.contains('active')) {
+      closeSearch();
+      return;
+    }
+    if (navMenu.classList.contains('active')) {
+      navMenu.classList.remove('active');
+    }
   }
 });
 
