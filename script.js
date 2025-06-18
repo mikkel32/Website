@@ -477,4 +477,11 @@ lazyImages.forEach(img => imageObserver.observe(img));
 window.addEventListener('beforeunload', () => {
   document.body.style.opacity = '0';
 });
+
+const resetOpacity = () => {
+  document.body.style.opacity = '1';
+};
+
+window.addEventListener('load', resetOpacity);
+window.addEventListener('pageshow', resetOpacity);
   

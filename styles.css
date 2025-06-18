@@ -24,7 +24,8 @@ body {
   background: var(--bg-color);
   color: var(--text-color);
   line-height: 1.6;
-  transition: background 0.3s ease, color 0.3s ease;
+  opacity: 1;
+  transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
 }
 
 .no-scroll {
