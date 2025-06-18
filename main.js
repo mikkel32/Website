@@ -8,7 +8,7 @@ import { initHeroAnimations } from './hero-animations.js';
 document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   const navMenu = initNavigation();
-  initHeroAnimations();
+  await initHeroAnimations();
 
   const counters = document.querySelectorAll('.stat-number');
   const speed = 200;

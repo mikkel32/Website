@@ -1,11 +1,37 @@
 // Import Anime.js from the local node_modules directory so the script works
 // when served by a simple HTTP server without a bundler.
-import { animate, stagger } from 'animejs';
+let animeModule;
 
-export function initHeroAnimations() {
+async function loadAnime() {
+  try {
+    animeModule = await import('animejs');
+  } catch (err) {
+    console.warn('Local Anime.js not found, loading from CDN...', err);
+    try {
+      animeModule = await import(
+        'https://cdn.jsdelivr.net/npm/animejs@4.0.2/lib/anime.esm.min.js'
+      );
+    } catch (cdnErr) {
+      console.error('Failed to load Anime.js from CDN', cdnErr);
+      animeModule = null;
+    }
+  }
+}
+
+export async function initHeroAnimations() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     return;
   }
+
+  if (!animeModule) {
+    await loadAnime();
+  }
+
+  if (!animeModule) {
+    return;
+  }
+
+  const { animate, stagger } = animeModule;
 
   animate('.hero-title', {
     opacity: [0, 1],
