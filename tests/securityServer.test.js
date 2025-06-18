@@ -11,7 +11,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 function startServer(port) {
   return new Promise((resolve, reject) => {
     const proc = spawn('python3', [join(__dirname, '..', 'security.py')], {
-      env: { ...process.env, NO_BROWSER: '1', PORT: String(port) },
+      env: {
+        ...process.env,
+        NO_BROWSER: '1',
+        PORT: String(port),
+        MAX_REQUESTS: '3',
+        RATE_WINDOW: '1',
+      },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
 
@@ -60,7 +66,7 @@ describe('security.py server', () => {
     expect(first.headers['x-frame-options']).toBe('DENY');
     expect(first.headers['content-security-policy']).toBeDefined();
     const codes = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 4; i++) {
       const res = await makeRequest();
       codes.push(res.statusCode);
     }
