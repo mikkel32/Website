@@ -4,10 +4,12 @@ import { initSearch } from './search.js';
 import { NotificationSystem, initNotificationToggle } from './notifications.js';
 import { setupSecurityDemo, securityFeatures } from './security-demo.js';
 import { validateForm } from './utils.js';
+import { initHeroAnimations } from './hero-animations.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   const navMenu = initNavigation();
+  initHeroAnimations();
 
   const counters = document.querySelectorAll('.stat-number');
   const speed = 200;
@@ -28,27 +30,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   };
 
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -100px 0px',
   };
 
-  const observer = new IntersectionObserver((entries) => {
+  const observer = new IntersectionObserver((entries, obs) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         if (entry.target.classList.contains('stat-item')) {
           animateCounters();
         }
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
+        if (prefersReducedMotion) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'none';
+        } else {
+          entry.target.classList.add('in-view');
+        }
+        obs.unobserve(entry.target);
       }
     });
   }, observerOptions);
 
   document.querySelectorAll('.feature-card, .service-item, .stat-item').forEach((el) => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(20px)';
-    el.style.transition = 'all 0.6s ease';
+    el.classList.add('reveal');
     observer.observe(el);
   });
 
