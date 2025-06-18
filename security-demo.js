@@ -51,6 +51,21 @@ export const securityFeatures = {
     const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, this.key, cipher);
     return new TextDecoder().decode(decrypted);
   },
+
+  async hmac(text, secret) {
+    const enc = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw',
+      enc.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    const signature = await crypto.subtle.sign('HMAC', key, enc.encode(text));
+    return Array.from(new Uint8Array(signature))
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  },
 };
 
 function addSecurityDemo() {
@@ -81,6 +96,13 @@ function addSecurityDemo() {
           <input type="text" id="hashInput" placeholder="Enter text to hash">
           <button class="btn btn-primary" id="hashButton">Hash</button>
           <div class="demo-result" id="hashResult"></div>
+        </div>
+        <div class="demo-card">
+          <h3>HMAC Generator</h3>
+          <input type="text" id="hmacInput" placeholder="Enter text">
+          <input type="text" id="hmacKey" placeholder="Secret key">
+          <button class="btn btn-primary" id="hmacButton">Generate</button>
+          <div class="demo-result" id="hmacResult"></div>
         </div>
       </div>
     </div>
@@ -123,6 +145,10 @@ export async function setupSecurityDemo(notifications) {
   const hashButton = document.getElementById('hashButton');
   const hashInput = document.getElementById('hashInput');
   const hashResult = document.getElementById('hashResult');
+  const hmacButton = document.getElementById('hmacButton');
+  const hmacInput = document.getElementById('hmacInput');
+  const hmacKey = document.getElementById('hmacKey');
+  const hmacResult = document.getElementById('hmacResult');
 
   encryptButton.addEventListener('click', async () => {
     if (!encryptInput.value) return;
@@ -151,5 +177,21 @@ export async function setupSecurityDemo(notifications) {
     const digest = await securityFeatures.hash(hashInput.value);
     hashResult.innerHTML = `<p><strong>SHA-256:</strong> ${digest}</p>`;
     hashResult.style.display = 'block';
+  });
+
+  hmacButton.addEventListener('click', async () => {
+    if (!hmacInput.value || !hmacKey.value) return;
+
+    if (
+      securityFeatures.scanInput(hmacInput.value) ||
+      securityFeatures.scanInput(hmacKey.value)
+    ) {
+      notifications.show('Potentially malicious input detected', 'warning');
+      return;
+    }
+
+    const mac = await securityFeatures.hmac(hmacInput.value, hmacKey.value);
+    hmacResult.innerHTML = `<p><strong>HMAC:</strong> ${mac}</p>`;
+    hmacResult.style.display = 'block';
   });
 }

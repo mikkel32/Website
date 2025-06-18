@@ -60,7 +60,8 @@ npm run dev
 - `main.js` – entry point that initializes all site features
 - `src/styles/` – SCSS source styles
 - `main.css` – compiled CSS served when running `security.py`
-- `security-demo.js` – dynamic demo section with cryptography utilities
+- `security-demo.js` – dynamic demo section with cryptography utilities such as
+  AES encryption, hashing, and HMAC generation
 - `tests/` – Jest unit tests for utilities and security features
 
 ## Diagnostics dashboard
@@ -89,4 +90,8 @@ panel state and captured logs between visits.
 ## Security auditing
 
 A GitHub Actions workflow automatically runs `npm audit` on every push and pull request. The build fails if any high-severity vulnerabilities are found. You can run the same check locally with `npm run audit`.
+
+## Automated pull request merging
+
+Another workflow merges pull requests once all checks succeed using the Node script `.github/scripts/auto-merge.js`. The workflow sets up Node with `actions/setup-node` and then runs the script with the provided GitHub token. If the PR cannot be merged, the script posts a comment explaining why and marks the job as failed.
 

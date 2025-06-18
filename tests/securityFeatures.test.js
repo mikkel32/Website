@@ -18,6 +18,11 @@ describe('securityFeatures', () => {
     expect(digest).toMatch(/^[a-f0-9]{64}$/);
   });
 
+  test('creates HMAC with SHA-256', async () => {
+    const mac = await securityFeatures.hmac('data', 'secret');
+    expect(mac).toMatch(/^[a-f0-9]{64}$/);
+  });
+
   test('detects malicious input', () => {
     expect(securityFeatures.scanInput('<script>alert(1)</script>')).toBe(true);
     expect(
