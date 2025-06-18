@@ -18,6 +18,20 @@ body {
   transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
 }
 
+.scroll-orb {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 120vmax;
+  height: 120vmax;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, var(--orb-color-start), var(--orb-color-end) 60%, transparent 80%);
+  transform: translate3d(-50%, -50%, 0);
+  z-index: -1;
+  will-change: transform;
+}
+
 .no-scroll {
   height: 100vh;
   overflow: hidden;
@@ -639,6 +653,10 @@ body.dark-mode .stats {
 
 body.dark-mode footer {
   background: #0a0a0a;
+}
+
+body.dark-mode .scroll-orb {
+  background: radial-gradient(circle at center, var(--orb-color-start), var(--orb-color-end) 60%, transparent 80%);
 }
 
 /* Animations */
