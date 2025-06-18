@@ -22,21 +22,19 @@ export function initTheme() {
   });
 
   const navbar = document.querySelector('.navbar');
-  if (navbar) {
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 100) {
-        navbar.style.background = body.classList.contains('dark-mode')
-          ? 'rgba(18, 18, 18, 0.98)'
-          : 'rgba(255, 255, 255, 0.98)';
-        navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-      } else {
-        navbar.style.background = body.classList.contains('dark-mode')
-          ? 'rgba(18, 18, 18, 0.95)'
-          : 'rgba(255, 255, 255, 0.95)';
-        navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-      }
-    });
-  }
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 100) {
+      navbar.style.background = body.classList.contains('dark-mode')
+        ? 'rgba(18, 18, 18, 0.98)'
+        : 'rgba(255, 255, 255, 0.98)';
+      navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+    } else {
+      navbar.style.background = body.classList.contains('dark-mode')
+        ? 'rgba(18, 18, 18, 0.95)'
+        : 'rgba(255, 255, 255, 0.95)';
+      navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+    }
+  });
 }
 
 export function initNavigation() {
