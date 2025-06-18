@@ -9,8 +9,8 @@ import { initDashboard } from './dashboard.js';
 document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   const navMenu = initNavigation();
-  await initHeroAnimations();
   initDashboard();
+  await initHeroAnimations();
 
   const counters = document.querySelectorAll('.stat-number');
   const speed = 200;
