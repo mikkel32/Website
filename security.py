@@ -42,6 +42,23 @@ def _install_python_sass() -> bool:
         return False
 
 
+def _run_postcss(css: Path) -> bool:
+    """Run PostCSS on the given CSS file if ``npx`` is available."""
+    npx_cmd = shutil.which("npx") or shutil.which("npx.cmd")
+    if not npx_cmd:
+        print("npx not found; skipping PostCSS step")
+        return False
+    try:
+        subprocess.run(
+            [npx_cmd, "--yes", "postcss", css.as_posix(), "-o", css.as_posix()],
+            check=True,
+        )
+        return True
+    except subprocess.CalledProcessError as exc:
+        print("Failed to run PostCSS:", exc)
+        return False
+
+
 def compile_scss() -> None:
     """Compile SCSS sources to CSS using either Node or the Python sass lib."""
     scss = ROOT_DIR / "src" / "styles" / "main.scss"
@@ -54,6 +71,7 @@ def compile_scss() -> None:
                 [npx_cmd, "--yes", "sass", scss.as_posix(), css.as_posix()],
                 check=True,
             )
+            _run_postcss(css)
             return
         except subprocess.CalledProcessError as exc:
             print("Failed to compile SCSS with npx:", exc)
@@ -70,6 +88,7 @@ def compile_scss() -> None:
     if pysass is not None:
         try:
             css.write_text(pysass.compile(filename=scss.as_posix()))
+            _run_postcss(css)
             return
         except Exception as exc:  # pylint: disable=broad-except
             print("Failed to compile SCSS with python sass:", exc)

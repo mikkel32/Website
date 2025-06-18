@@ -9,6 +9,9 @@ It automatically compiles the SCSS styles to `main.css` on startup.
 Compilation uses the Node `sass` binary via `npx` when available and will
 fall back to the Python `sass` package when `npx` cannot be found. If the module
 is not installed the server will attempt to install it with `pip`.
+After the SCSS is compiled, the resulting CSS is automatically processed
+with PostCSS using the included configuration. This adds vendor prefixes via
+Autoprefixer so the styles work consistently across browsers.
 
 **Node.js is strongly recommended.** The Python fallback requires a working C/C++
 compiler and may fail on some platforms (for example Python 3.13 on Windows does
