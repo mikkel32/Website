@@ -1,5 +1,7 @@
 import { checkPasswordStrength } from './utils.js';
-import DOMPurify from 'dompurify';
+// Import DOMPurify directly from the local node_modules directory so the module
+// resolution works even when import maps are not supported by the browser.
+import DOMPurify from './node_modules/dompurify/dist/purify.es.mjs';
 
 export const securityFeatures = {
   key: null,
