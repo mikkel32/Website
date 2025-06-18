@@ -2,11 +2,11 @@
   "name": "website",
   "version": "1.0.0",
   "description": "",
-  "main": "script.js",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"No tests specified\"",
     "lint": "npm run lint:js && npm run lint:css",
-    "lint:js": "eslint script.js",
+    "lint:js": "eslint *.js",
     "lint:css": "stylelint \"**/*.css\""
   },
   "keywords": [],
