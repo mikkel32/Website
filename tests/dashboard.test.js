@@ -29,4 +29,28 @@ describe('initDashboard', () => {
     const log = document.querySelector('.log-error');
     expect(log).not.toBeNull();
   });
+
+  test('captures window errors and rejections', () => {
+    document.body.innerHTML = `
+      <ul id="dashboardLogs" class="log-list"></ul>
+      <ul id="fetchLogs" class="tree-list"></ul>
+    `;
+    let stats = null;
+    initDashboard({ onStats: (s) => (stats = s) });
+
+    window.dispatchEvent(new ErrorEvent('error', { message: 'kaboom' }));
+    let logItems = document.querySelectorAll('.log-error');
+    expect(logItems.length).toBe(1);
+    expect(logItems[0].textContent).toMatch('kaboom');
+    expect(stats.errors).toBe(1);
+
+    const rej = new Event('unhandledrejection');
+    rej.reason = new Error('oops');
+    window.dispatchEvent(rej);
+
+    logItems = document.querySelectorAll('.log-error');
+    expect(logItems.length).toBe(2);
+    expect(logItems[1].textContent).toMatch('oops');
+    expect(stats.errors).toBe(2);
+  });
 });
