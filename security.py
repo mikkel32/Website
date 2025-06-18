@@ -85,11 +85,19 @@ class SecureHandler(SimpleHTTPRequestHandler):
         int(os.environ.get("RATE_WINDOW", "1")),
     )
 
+    # Content Security Policy template used for every response. Include a
+    # ``{nonce}`` placeholder to automatically inject a per-request nonce.
+    csp_template = os.environ.get(
+        "CONTENT_SECURITY_POLICY",
+        "default-src 'self'; script-src 'self' {nonce}; style-src 'self'",
+    )
+
     def end_headers(self) -> None:  # type: ignore[override]
-        self.send_header(
-            "Content-Security-Policy",
-            "default-src 'self'; script-src 'self'; style-src 'self'"
-        )
+        nonce_value = token_urlsafe(16)
+        csp_header = self.csp_template
+        if "{nonce}" in csp_header:
+            csp_header = csp_header.replace("{nonce}", f"'nonce-{nonce_value}'")
+        self.send_header("Content-Security-Policy", csp_header)
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
         self.send_header("X-Frame-Options", "DENY")
