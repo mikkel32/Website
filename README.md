@@ -48,7 +48,7 @@ and helps catch policy violations during development.
 address. When a client exceeds the allowed number of requests within the
 configured time window, the server responds with **HTTP 429 Too Many Requests**.
 
-The defaults allow **5** requests every **1** second. You can adjust these
+The defaults allow **20** requests every **1** second. You can adjust these
 limits by setting the environment variables `MAX_REQUESTS` and `RATE_WINDOW`:
 
 ```bash
