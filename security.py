@@ -82,7 +82,7 @@ class SecureHandler(SimpleHTTPRequestHandler):
     """HTTP handler that injects security headers for every response."""
 
     rate_limiter = RateLimiter(
-        int(os.environ.get("MAX_REQUESTS", "5")),
+        int(os.environ.get("MAX_REQUESTS", "20")),
         int(os.environ.get("RATE_WINDOW", "1")),
     )
 
@@ -306,7 +306,7 @@ def _find_free_port(start: int = 8000) -> int:
 def main() -> None:
     _ensure_node_deps()
     compile_scss()
-    limit = int(os.environ.get("MAX_REQUESTS", "5"))
+    limit = int(os.environ.get("MAX_REQUESTS", "20"))
     window = int(os.environ.get("RATE_WINDOW", "1"))
     SecureHandler.rate_limiter = RateLimiter(limit, window)
     port = int(os.environ.get("PORT", _find_free_port()))
