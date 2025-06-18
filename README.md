@@ -6,11 +6,12 @@ This project showcases an interactive security themed landing page built with mo
 
 The simplest way to view the site is via the included Python server.
 It automatically compiles the SCSS styles to `main.css` on startup.
-Compilation uses the Node `sass` binary via `npx` if available, falling back to
-the Python `sass` package when installed:
+Compilation uses the Node `sass` binary via `npx` when available and will
+attempt to use the Python `sass` package otherwise. If the module is not
+installed the server will try to install it with `pip`.
 
-Ensure you have Node.js installed or run `pip install sass` to enable the
-fallback compiler.
+Ensure you have Node.js installed or that `pip` is available so the fallback can
+be installed automatically when needed.
 
 ```bash
 npm install   # install dependencies such as Anime.js
