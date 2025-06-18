@@ -1,4 +1,3 @@
-import "./main.css";
 import { initTheme, initNavigation } from './theme.js';
 import { initSearch } from './search.js';
 import { NotificationSystem, initNotificationToggle } from './notifications.js';
