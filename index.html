@@ -33,6 +33,9 @@
         <li><a href="#gallery">Gallery</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
+      <button class="search-toggle" aria-label="Open search" aria-haspopup="dialog" aria-controls="searchOverlay" aria-expanded="false">
+        <i class="fas fa-search"></i>
+      </button>
       <button class="nav-toggle" aria-label="Toggle navigation">
         <span>&nbsp;</span>
         <span>&nbsp;</span>
@@ -217,8 +220,9 @@
     </div>
   </footer>
 
-  <div id="searchOverlay" class="search-overlay" aria-hidden="true">
+  <div id="searchOverlay" class="search-overlay" aria-hidden="true" role="dialog">
     <div class="search-box">
+      <button class="search-close" aria-label="Close search">&times;</button>
       <input type="text" id="searchInput" placeholder="Search..." aria-label="Search" />
       <ul id="searchResults" class="search-results"></ul>
     </div>
