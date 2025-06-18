@@ -11,6 +11,7 @@ import socket
 from pathlib import Path
 import subprocess
 import shutil
+import sys
 
 try:
     import sass as pysass  # type: ignore
@@ -18,6 +19,18 @@ except Exception:  # ImportError or other issues
     pysass = None
 
 ROOT_DIR = Path(__file__).parent
+
+def _install_python_sass() -> bool:
+    """Attempt to install the python ``sass`` module via pip."""
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "--user", "sass"],
+            check=True,
+        )
+        return True
+    except Exception as exc:  # pylint: disable=broad-except
+        print("Failed to auto-install python sass module:", exc)
+        return False
 
 
 def compile_scss() -> None:
@@ -38,6 +51,13 @@ def compile_scss() -> None:
     else:
         print("npx not found; attempting to use python sass module")
 
+    if pysass is None:
+        if _install_python_sass():
+            try:
+                import sass as pysass_installed  # type: ignore
+                globals()["pysass"] = pysass_installed
+            except Exception as exc:  # pylint: disable=broad-except
+                print("Failed to import python sass after install:", exc)
     if pysass is not None:
         try:
             css.write_text(pysass.compile(filename=scss.as_posix()))
