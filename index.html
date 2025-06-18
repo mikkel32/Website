@@ -6,6 +6,7 @@
   <title>SecureGuard - Advanced Security Solutions</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&amp;display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAI0lEQVR42mNkYGD4z8DAwMDAgAn8j8DAYTAIMwgwGhAIAAOWcBShK5T2wAAAAASUVORK5CYII=" />
 </head>
 <body class="no-scroll">
   <div id="preloader">
@@ -227,6 +228,11 @@
     </div>
   </div>
 
+  <script>
+    if (location.protocol === 'file:') {
+      document.body.innerHTML = '<p style="padding:2rem;font-size:1.2rem">Please run this site via a local server (e.g., <code>python security.py</code>) to avoid CORS issues.</p>';
+    }
+  </script>
   <script type="module" src="main.js"></script>
 </body>
 </html>
