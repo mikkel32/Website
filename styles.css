@@ -818,6 +818,59 @@ body.dark-mode .demo-card {
   border-color: var(--danger-color);
 }
 
+/* About Section */
+.about {
+  padding: 5rem 0;
+  background: var(--bg-color);
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: center;
+  gap: 2rem;
+}
+
+.about-text p {
+  color: var(--text-light);
+  line-height: 1.8;
+}
+
+.about-image img {
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: var(--card-shadow);
+}
+
+/* Gallery Section */
+.gallery {
+  padding: 5rem 0;
+  background: #f8f8f8;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.gallery-grid img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: var(--card-shadow);
+}
+
+/* Fade-in effect for lazy-loaded images */
+.lazy-image {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.lazy-image.loaded {
+  opacity: 1;
+}
+
 /* Notification System */
 .notification-container {
   position: fixed;
