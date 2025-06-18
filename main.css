@@ -864,6 +864,61 @@ body.dark-mode .demo-card {
   list-style: disc;
 }
 
+/* Dashboard Section */
+.dashboard {
+  padding: 5rem 0;
+  background: var(--bg-color);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.dashboard-panel {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: var(--card-shadow);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+body.dark-mode .dashboard-panel {
+  background: #1e1e1e;
+}
+
+.log-list,
+.tree-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.tree-list ul {
+  margin-left: 1rem;
+  border-left: 2px solid var(--border-color);
+  padding-left: 0.5rem;
+}
+
+.log-error {
+  color: var(--danger-color);
+}
+
+.log-warning {
+  color: var(--warning-color);
+}
+
+.log-success {
+  color: var(--success-color);
+}
+
+.fetch-url {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
 /* Contact Section */
 .contact {
   padding: 5rem 0;
