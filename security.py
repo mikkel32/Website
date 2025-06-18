@@ -21,6 +21,19 @@ except Exception:  # ImportError or other issues
 ROOT_DIR = Path(__file__).parent
 
 
+class SecureHandler(SimpleHTTPRequestHandler):
+    """HTTP handler that injects security headers for every response."""
+
+    def end_headers(self) -> None:  # type: ignore[override]
+        self.send_header(
+            "Content-Security-Policy",
+            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+        )
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
+        super().end_headers()
+
+
 def _ensure_node_deps() -> None:
     """Install Node dependencies if ``animejs`` is missing."""
     anime_path = ROOT_DIR / "node_modules" / "animejs" / "lib" / "anime.esm.js"
@@ -145,7 +158,7 @@ def main() -> None:
     _ensure_node_deps()
     compile_scss()
     port = _find_free_port()
-    handler = partial(SimpleHTTPRequestHandler, directory=ROOT_DIR)
+    handler = partial(SecureHandler, directory=ROOT_DIR)
     with ThreadingHTTPServer(("localhost", port), handler) as httpd:
         url = f"http://localhost:{port}/"
         print(f"Serving {ROOT_DIR} at {url}")
