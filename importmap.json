@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "animejs": "./node_modules/animejs/lib/anime.esm.js"
+  }
+}

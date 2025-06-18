@@ -6,6 +6,13 @@ import { setupSecurityDemo, securityFeatures } from './security-demo.js';
 import { validateForm, getCSRFToken, validateCSRFToken } from './utils.js';
 import { initHeroAnimations } from './hero-animations.js';
 
+if (window.location.protocol === 'file:') {
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.innerHTML =
+      '<p style="padding:2rem;font-size:1.2rem">Please run this site via a local server (e.g., <code>python security.py</code>) to avoid CORS issues.</p>';
+  });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   const navMenu = initNavigation();
