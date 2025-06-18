@@ -8,6 +8,7 @@
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint --no-error-on-unmatched-pattern *.js src/**/*.js tests/**/*.js",
     "lint:css": "stylelint nonexistent.css --allow-empty-input",
+    "audit": "npm audit --production --audit-level=high",
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview"
