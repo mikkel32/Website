@@ -70,4 +70,19 @@ describe('initDashboard', () => {
     expect(item).not.toBeNull();
     expect(item.textContent).toMatch('persisted message');
   });
+
+  test('sanitizes log entries containing HTML', async () => {
+    document.body.innerHTML = `
+      <ul id="dashboardLogs" class="log-list"></ul>
+      <ul id="fetchLogs" class="tree-list"></ul>
+    `;
+    localStorage.clear();
+    const { initDashboard } = await import('../dashboard/core.js');
+    initDashboard();
+    console.log('<img src=x onerror="window.hacked=true">');
+    const item = document.querySelector('.log-info');
+    expect(item).not.toBeNull();
+    expect(item.textContent).toMatch('<img src=x onerror="window.hacked=true">');
+    expect(document.querySelector('img')).toBeNull();
+  });
 });

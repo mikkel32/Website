@@ -155,7 +155,12 @@ export function initDashboard(options = {}) {
     li.className = `log-${type}`;
     li.dataset.type = type;
     const timestamp = new Date().toLocaleTimeString();
-    li.innerHTML = `<span class="log-timestamp">${timestamp}</span> ${message}`;
+    const ts = document.createElement('span');
+    ts.className = 'log-timestamp';
+    ts.textContent = timestamp;
+    li.appendChild(ts);
+    li.appendChild(document.createTextNode(' '));
+    li.appendChild(document.createTextNode(message));
     li.style.display = 'none';
     logList.appendChild(li);
     logHistory.push({ type, message, timestamp });
@@ -168,7 +173,10 @@ export function initDashboard(options = {}) {
 
   const addFetchEntry = (entry) => {
     const node = document.createElement('li');
-    node.innerHTML = `<span class="fetch-url">${entry.url}</span>`;
+    const urlSpan = document.createElement('span');
+    urlSpan.className = 'fetch-url';
+    urlSpan.textContent = entry.url;
+    node.appendChild(urlSpan);
     const children = document.createElement('ul');
     node.appendChild(children);
     fetchTree.appendChild(node);
