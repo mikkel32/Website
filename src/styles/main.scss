@@ -914,6 +914,36 @@ body.dark-mode .demo-card {
   overflow-y: auto;
 }
 
+.dashboard-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-small {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 4px;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.log-list li {
+  font-family: monospace;
+  margin-bottom: 0.25rem;
+}
+
+.log-timestamp {
+  color: var(--text-light);
+  margin-right: 0.5rem;
+}
+
 body.dark-mode .dashboard-panel {
   background: #1e1e1e;
 }
