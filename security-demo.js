@@ -46,7 +46,7 @@ function addSecurityDemo() {
         <div class="demo-card">
           <h3>AES-GCM Encryption Demo</h3>
           <input type="text" id="encryptInput" placeholder="Enter text to encrypt">
-          <button class="btn btn-primary" onclick="encryptDemo()">Encrypt</button>
+          <button class="btn btn-primary" id="encryptButton">Encrypt</button>
           <div class="demo-result" id="encryptResult"></div>
         </div>
         <div class="demo-card">
@@ -93,21 +93,24 @@ export async function setupSecurityDemo(notifications) {
     }
   });
 
-  window.encryptDemo = async function encryptDemo() {
-    const input = document.getElementById('encryptInput');
-    const result = document.getElementById('encryptResult');
+  const encryptButton = document.getElementById('encryptButton');
+  const encryptInput = document.getElementById('encryptInput');
+  const encryptResult = document.getElementById('encryptResult');
 
-    if (input.value) {
-      if (securityFeatures.scanInput(input.value)) {
-        notifications.show('Potentially malicious input detected', 'warning');
-      }
-      const encrypted = await securityFeatures.encrypt(input.value);
-      const decrypted = await securityFeatures.decrypt(encrypted);
-      result.innerHTML = `
-        <p><strong>Encrypted:</strong> ${encrypted}</p>
-        <p><strong>Decrypted:</strong> ${DOMPurify.sanitize(decrypted)}</p>
-      `;
-      result.style.display = 'block';
+  encryptButton.addEventListener('click', async () => {
+    if (!encryptInput.value) return;
+
+    if (securityFeatures.scanInput(encryptInput.value)) {
+      notifications.show('Potentially malicious input detected', 'warning');
     }
-  };
+
+    const encrypted = await securityFeatures.encrypt(encryptInput.value);
+    const decrypted = await securityFeatures.decrypt(encrypted);
+
+    encryptResult.innerHTML = `
+      <p><strong>Encrypted:</strong> ${encrypted}</p>
+      <p><strong>Decrypted:</strong> ${DOMPurify.sanitize(decrypted)}</p>
+    `;
+    encryptResult.style.display = 'block';
+  });
 }
