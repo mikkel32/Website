@@ -1,5 +1,6 @@
 {
   "imports": {
     "animejs": "./node_modules/animejs/lib/anime.esm.js"
+    "dompurify": "./node_modules/dompurify/dist/purify.es.js",
   }
 }
