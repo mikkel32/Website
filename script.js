@@ -1,158 +1,152 @@
-// Theme Toggle
-const themeToggle = document.querySelector('.theme-toggle');
-const body = document.body;
-const icon = themeToggle.querySelector('i');
-
-// Check for saved theme preference
-const currentTheme = localStorage.getItem('theme');
-if (currentTheme === 'dark') {
-  body.classList.add('dark-mode');
-  icon.classList.remove('fa-moon');
-  icon.classList.add('fa-sun');
-}
-
-themeToggle.addEventListener('click', () => {
-  body.classList.toggle('dark-mode');
-  
-  if (body.classList.contains('dark-mode')) {
-    icon.classList.remove('fa-moon');
-    icon.classList.add('fa-sun');
-    localStorage.setItem('theme', 'dark');
-  } else {
-    icon.classList.remove('fa-sun');
-    icon.classList.add('fa-moon');
-    localStorage.setItem('theme', 'light');
-  }
-});
-
-// Mobile Navigation Toggle
-const navToggle = document.querySelector('.nav-toggle');
-const navMenu = document.querySelector('.nav-menu');
-
-navToggle.addEventListener('click', () => {
-  navMenu.classList.toggle('active');
-  
-  // Animate hamburger menu
-  const spans = navToggle.querySelectorAll('span');
-  spans[0].style.transform = navMenu.classList.contains('active') 
-    ? 'rotate(-45deg) translate(-5px, 6px)' : '';
-  spans[1].style.opacity = navMenu.classList.contains('active') ? '0' : '1';
-  spans[2].style.transform = navMenu.classList.contains('active') 
-    ? 'rotate(45deg) translate(-5px, -6px)' : '';
-});
-
-// Close mobile menu when clicking on a link
-document.querySelectorAll('.nav-menu a').forEach(link => {
-  link.addEventListener('click', () => {
-    navMenu.classList.remove('active');
-    const spans = navToggle.querySelectorAll('span');
-    spans[0].style.transform = '';
-    spans[1].style.opacity = '1';
-    spans[2].style.transform = '';
-  });
-});
-
-// Smooth Scrolling
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
-  });
-});
-
-// Navbar Background on Scroll
-const navbar = document.querySelector('.navbar');
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 100) {
-    navbar.style.background = body.classList.contains('dark-mode') 
-      ? 'rgba(18, 18, 18, 0.98)' 
-      : 'rgba(255, 255, 255, 0.98)';
-    navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-  } else {
-    navbar.style.background = body.classList.contains('dark-mode')
-      ? 'rgba(18, 18, 18, 0.95)'
-      : 'rgba(255, 255, 255, 0.95)';
-    navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-  }
-});
-
-// Animated Counter
-const counters = document.querySelectorAll('.stat-number');
-const speed = 200;
-
-const animateCounters = () => {
-  counters.forEach(counter => {
-    const updateCount = () => {
-      const target = +counter.getAttribute('data-target');
-      const count = +counter.innerText;
-      const inc = target / speed;
-
-      if (count < target) {
-        counter.innerText = Math.ceil(count + inc);
-        setTimeout(updateCount, 1);
-      } else {
-        counter.innerText = target;
-      }
-    };
-    updateCount();
-  });
-};
-
-// Intersection Observer for animations
-const observerOptions = {
-  threshold: 0.1,
-  rootMargin: '0px 0px -100px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      if (entry.target.classList.contains('stat-item')) {
-        animateCounters();
-      }
-      entry.target.style.opacity = '1';
-      entry.target.style.transform = 'translateY(0)';
-    }
-  });
-}, observerOptions);
-
-// Observe elements
-document.querySelectorAll('.feature-card, .service-item, .stat-item').forEach(el => {
-  el.style.opacity = '0';
-  el.style.transform = 'translateY(20px)';
-  el.style.transition = 'all 0.6s ease';
-  observer.observe(el);
-});
-
-// Add Scroll to Top Button
-const scrollTopBtn = document.createElement('button');
-scrollTopBtn.className = 'scroll-top';
-scrollTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-document.body.appendChild(scrollTopBtn);
-
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 500) {
-    scrollTopBtn.classList.add('active');
-  } else {
-    scrollTopBtn.classList.remove('active');
-  }
-});
-
-scrollTopBtn.addEventListener('click', () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  });
-});
+let notifications;
 
 // Initialize features once the DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+  // Theme Toggle
+  const themeToggle = document.querySelector('.theme-toggle');
+  const body = document.body;
+  const icon = themeToggle.querySelector('i');
+
+  const currentTheme = localStorage.getItem('theme');
+  if (currentTheme === 'dark') {
+    body.classList.add('dark-mode');
+    icon.classList.replace('fa-moon', 'fa-sun');
+  }
+
+  themeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark-mode');
+
+    if (body.classList.contains('dark-mode')) {
+      icon.classList.replace('fa-moon', 'fa-sun');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      icon.classList.replace('fa-sun', 'fa-moon');
+      localStorage.setItem('theme', 'light');
+    }
+  });
+
+  // Mobile Navigation Toggle
+  const navToggle = document.querySelector('.nav-toggle');
+  const navMenu = document.querySelector('.nav-menu');
+
+  navToggle.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+
+    const spans = navToggle.querySelectorAll('span');
+    spans[0].style.transform = navMenu.classList.contains('active')
+      ? 'rotate(-45deg) translate(-5px, 6px)' : '';
+    spans[1].style.opacity = navMenu.classList.contains('active') ? '0' : '1';
+    spans[2].style.transform = navMenu.classList.contains('active')
+      ? 'rotate(45deg) translate(-5px, -6px)' : '';
+  });
+
+  document.querySelectorAll('.nav-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      navMenu.classList.remove('active');
+      const spans = navToggle.querySelectorAll('span');
+      spans[0].style.transform = '';
+      spans[1].style.opacity = '1';
+      spans[2].style.transform = '';
+    });
+  });
+
+  // Smooth Scrolling
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+
+  // Navbar Background on Scroll
+  const navbar = document.querySelector('.navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 100) {
+      navbar.style.background = body.classList.contains('dark-mode')
+        ? 'rgba(18, 18, 18, 0.98)'
+        : 'rgba(255, 255, 255, 0.98)';
+      navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+    } else {
+      navbar.style.background = body.classList.contains('dark-mode')
+        ? 'rgba(18, 18, 18, 0.95)'
+        : 'rgba(255, 255, 255, 0.95)';
+      navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+    }
+  });
+
+  // Animated Counter
+  const counters = document.querySelectorAll('.stat-number');
+  const speed = 200;
+
+  const animateCounters = () => {
+    counters.forEach(counter => {
+      const updateCount = () => {
+        const target = +counter.getAttribute('data-target');
+        const count = +counter.innerText;
+        const inc = target / speed;
+
+        if (count < target) {
+          counter.innerText = Math.ceil(count + inc);
+          setTimeout(updateCount, 1);
+        } else {
+          counter.innerText = target;
+        }
+      };
+      updateCount();
+    });
+  };
+
+  // Intersection Observer for animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -100px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        if (entry.target.classList.contains('stat-item')) {
+          animateCounters();
+        }
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.feature-card, .service-item, .stat-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'all 0.6s ease';
+    observer.observe(el);
+  });
+
+  // Add Scroll to Top Button
+  const scrollTopBtn = document.createElement('button');
+  scrollTopBtn.className = 'scroll-top';
+  scrollTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+  document.body.appendChild(scrollTopBtn);
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 500) {
+      scrollTopBtn.classList.add('active');
+    } else {
+      scrollTopBtn.classList.remove('active');
+    }
+  });
+
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
   const preloader = document.getElementById('preloader');
   if (preloader) {
     preloader.classList.add('fade-out');
@@ -162,6 +156,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   addSecurityDemo();
   securityFeatures.init();
+
+  notifications = new NotificationSystem();
+
+  // Search Overlay Elements
+  const searchOverlay = document.getElementById('searchOverlay');
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+  let searchIndex = [];
+
+  function openSearch() {
+    searchOverlay.classList.add('active');
+    searchOverlay.setAttribute('aria-hidden', 'false');
+    searchInput.value = '';
+    searchResults.innerHTML = '';
+    searchInput.focus();
+    document.body.classList.add('no-scroll');
+  }
+
+  function closeSearch() {
+    searchOverlay.classList.remove('active');
+    searchOverlay.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll');
+  }
 
   const notificationToggle = document.querySelector('.notification-toggle');
   if (notificationToggle) {
@@ -258,6 +275,58 @@ document.addEventListener('DOMContentLoaded', () => {
       closeSearch();
     }
   });
+
+  // Add keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      openSearch();
+    }
+
+    if (e.key === 'Escape') {
+      if (searchOverlay.classList.contains('active')) {
+        closeSearch();
+        return;
+      }
+      if (navMenu.classList.contains('active')) {
+        navMenu.classList.remove('active');
+      }
+    }
+  });
+
+  // Performance optimization - Lazy load images
+  const lazyImages = document.querySelectorAll('img.lazy-image[data-src]');
+  const imageObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.addEventListener('load', () => img.classList.add('loaded'), {
+            once: true
+          });
+          img.removeAttribute('data-src');
+          observer.unobserve(img);
+        }
+      });
+    },
+    { rootMargin: '0px 0px 200px 0px' }
+  );
+
+  lazyImages.forEach(img => imageObserver.observe(img));
+
+  // Add page transition effects
+  window.addEventListener('beforeunload', () => {
+    document.body.style.opacity = '0';
+  });
+
+  const resetOpacity = () => {
+    document.body.style.opacity = '1';
+  };
+
+  window.addEventListener('load', resetOpacity);
+  window.addEventListener('pageshow', resetOpacity);
+
 });
 
 // Form Validation (if you add a contact form)
@@ -476,80 +545,4 @@ class NotificationSystem {
     return icons[type] || icons.info;
   }
 }
-
-const notifications = new NotificationSystem();
-
-// Search Overlay Elements
-const searchOverlay = document.getElementById('searchOverlay');
-const searchInput = document.getElementById('searchInput');
-const searchResults = document.getElementById('searchResults');
-let searchIndex = [];
-
-function openSearch() {
-  searchOverlay.classList.add('active');
-  searchOverlay.setAttribute('aria-hidden', 'false');
-  searchInput.value = '';
-  searchResults.innerHTML = '';
-  searchInput.focus();
-  document.body.classList.add('no-scroll');
-}
-
-function closeSearch() {
-  searchOverlay.classList.remove('active');
-  searchOverlay.setAttribute('aria-hidden', 'true');
-  document.body.classList.remove('no-scroll');
-}
-
-// Add keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-  // Ctrl/Cmd + K for search
-  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-    e.preventDefault();
-    openSearch();
-  }
-
-  // Escape to close mobile menu
-  if (e.key === 'Escape') {
-    if (searchOverlay.classList.contains('active')) {
-      closeSearch();
-      return;
-    }
-    if (navMenu.classList.contains('active')) {
-      navMenu.classList.remove('active');
-    }
-  }
-});
-
-// Performance optimization - Lazy load images
-const lazyImages = document.querySelectorAll('img.lazy-image[data-src]');
-const imageObserver = new IntersectionObserver(
-  (entries, observer) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const img = entry.target;
-        img.src = img.dataset.src;
-        img.addEventListener('load', () => img.classList.add('loaded'), {
-          once: true
-        });
-        img.removeAttribute('data-src');
-        observer.unobserve(img);
-      }
-    });
-  },
-  { rootMargin: '0px 0px 200px 0px' }
-);
-
-lazyImages.forEach(img => imageObserver.observe(img));
-
-// Add page transition effects
-window.addEventListener('beforeunload', () => {
-  document.body.style.opacity = '0';
-});
-
-const resetOpacity = () => {
-  document.body.style.opacity = '1';
-};
-
-window.addEventListener('load', resetOpacity);
-window.addEventListener('pageshow', resetOpacity);
   

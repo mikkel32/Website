@@ -4,7 +4,10 @@
   "description": "",
   "main": "script.js",
   "scripts": {
-    "test": "echo \"No tests specified\""
+    "test": "echo \"No tests specified\"",
+    "lint": "npm run lint:js && npm run lint:css",
+    "lint:js": "eslint script.js",
+    "lint:css": "stylelint \"**/*.css\""
   },
   "keywords": [],
   "author": "",
