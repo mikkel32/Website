@@ -57,30 +57,28 @@ export async function initHeroAnimations() {
     return;
   }
 
-  const { animate, stagger } = animeModule;
+  const { animate, stagger, timeline } = animeModule;
 
-  animate('.hero-title', {
+  const tl = timeline({ easing: 'easeOutCubic', duration: 700 });
+
+  tl.add({
+    targets: '.hero-title',
     opacity: [0, 1],
     translateY: [40, 0],
-    duration: 700,
-    easing: 'easeOutCubic',
-  });
+  })
+    .add({
+      targets: '.hero-subtitle',
+      opacity: [0, 1],
+      translateY: [40, 0],
+    }, '-=400')
+    .add({
+      targets: '.hero-buttons .btn',
+      opacity: [0, 1],
+      translateY: [40, 0],
+      delay: stagger(100),
+      duration: 600,
+    }, '-=300');
 
-  animate('.hero-subtitle', {
-    opacity: [0, 1],
-    translateY: [40, 0],
-    duration: 700,
-    delay: 200,
-    easing: 'easeOutCubic',
-  });
-
-  animate('.hero-buttons .btn', {
-    opacity: [0, 1],
-    translateY: [40, 0],
-    delay: stagger(100, { start: 400 }),
-    duration: 600,
-    easing: 'easeOutCubic',
-  });
 
   animate('.shield-animation', {
     opacity: [0, 1],
@@ -100,10 +98,13 @@ export async function initHeroAnimations() {
   });
 
   animate('.hero-shapes .shape', {
-    translateX: [0, 30],
+    translateX: [0, 40],
+    translateY: [0, -30],
+    rotate: [0, 360],
     direction: 'alternate',
     loop: true,
     easing: 'easeInOutSine',
     delay: stagger(200, { start: 1200 }),
+    duration: 6000,
   });
 }

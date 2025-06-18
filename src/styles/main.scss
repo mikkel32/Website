@@ -130,7 +130,7 @@ section {
   min-height: calc(100vh - 80px);
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 60%, var(--accent-color) 100%);
   position: relative;
   overflow: hidden;
 }
@@ -275,19 +275,21 @@ section {
 }
 
 @keyframes float-shape {
-  0%, 100% {
-    transform: translateY(0) translateX(0);
+  0% {
+    transform: translate(0, 0) rotate(0deg);
   }
-
   50% {
-    transform: translateY(-20px) translateX(20px);
+    transform: translate(40px, -30px) rotate(45deg);
+  }
+  100% {
+    transform: translate(-40px, 20px) rotate(90deg);
   }
 }
 
 /* Features Section */
 .features {
   padding: 5rem 0;
-  background: var(--bg-color);
+  background: linear-gradient(180deg, var(--bg-color), var(--bg-secondary));
 }
 
 .container {
@@ -411,6 +413,7 @@ section {
 /* Services Section */
 .services {
   padding: 5rem 0;
+  background: linear-gradient(180deg, var(--bg-secondary), var(--surface-color));
 }
 
 .services-list {

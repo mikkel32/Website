@@ -4,28 +4,29 @@
 /* stylelint-disable */
 :root {
   /* Modern color palette */
-  --primary-color: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: #818cf8;
-  --accent-color: #f43f5e;
+  --primary-color: #7c3aed;
+  --primary-dark: #4c1d95;
+  --primary-light: #c4b5fd;
+  --accent-color: #ec4899;
   --success-color: #10b981;
   --warning-color: #f59e0b;
   --danger-color: #ef4444;
   /* Neutral colors */
-  --bg-color: #f8fafc;
-  --bg-secondary: #f1f5f9;
+  --bg-color: #f9fafb;
+  --bg-secondary: #f3f4f6;
   --surface-color: #ffffff;
-  --text-color: #0f172a;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-  --border-color: #e2e8f0;
-  --border-light: #f1f5f9;
+  --text-color: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --border-light: #f3f4f6;
   /* Shadows and effects */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --shadow-glow: 0 0 20px rgb(99 102 241 / 0.15);
+  --card-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
   /* Typography */
   --font-family: "Inter", "Poppins", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "Fira Code", "SF Mono", Consolas, monospace;
@@ -42,17 +43,18 @@
 
 /* stylelint-enable */
 body.dark-mode {
-  --bg-color: #0f172a;
-  --bg-secondary: #1e293b;
-  --surface-color: #1e293b;
-  --text-color: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --border-color: #334155;
-  --border-light: #1e293b;
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
-  --shadow-glow: 0 0 30px rgb(99 102 241 / 0.25);
+  --bg-color: #111827;
+  --bg-secondary: #1f2937;
+  --surface-color: #1f2937;
+  --text-color: #f3f4f6;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --border-color: #374151;
+  --border-light: #1f2937;
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-glow: 0 0 30px rgb(124 58 237 / 0.4);
+  --card-shadow: 0 8px 20px rgb(0 0 0 / 0.2);
 }
 
 * {
@@ -183,7 +185,7 @@ section {
   min-height: calc(100vh - 80px);
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 60%, var(--accent-color) 100%);
   position: relative;
   overflow: hidden;
 }
@@ -328,17 +330,20 @@ section {
 }
 
 @keyframes float-shape {
-  0%, 100% {
-    transform: translateY(0) translateX(0);
+  0% {
+    transform: translate(0, 0) rotate(0deg);
   }
   50% {
-    transform: translateY(-20px) translateX(20px);
+    transform: translate(40px, -30px) rotate(45deg);
+  }
+  100% {
+    transform: translate(-40px, 20px) rotate(90deg);
   }
 }
 /* Features Section */
 .features {
   padding: 5rem 0;
-  background: var(--bg-color);
+  background: linear-gradient(180deg, var(--bg-color), var(--bg-secondary));
 }
 
 .container {
@@ -455,6 +460,7 @@ section {
 /* Services Section */
 .services {
   padding: 5rem 0;
+  background: linear-gradient(180deg, var(--bg-secondary), var(--surface-color));
 }
 
 .services-list {
