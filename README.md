@@ -29,6 +29,9 @@ npm install   # install dependencies such as Anime.js
 python security.py
 ```
 
+Run `npm install` before any `npm test` or `python security.py` command to
+ensure all dependencies are available.
+
 If dependencies are missing, scripts like the hero animations may fail to load
 (resulting in 404 errors for files under `node_modules`). The `security.py`
 server automatically attempts to run `npm install` when these packages are not
@@ -74,6 +77,7 @@ npm run dev
 - `npm test` – run the Jest unit tests
 - `npm run lint` – run ESLint and Stylelint
 - `npm run audit` – check dependencies for vulnerabilities (fails on high severity)
+- Ensure dependencies are installed with `npm install` before running these commands.
 
 ## Project structure
 
