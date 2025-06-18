@@ -37,7 +37,7 @@ def _ensure_node_deps() -> None:
 
     print("Node dependencies missing; running 'npm install'...")
     try:
-        subprocess.run([npm_cmd, "install"], check=True)
+        subprocess.run([npm_cmd, "install"], check=True, cwd=ROOT_DIR)
     except subprocess.CalledProcessError as exc:
         print("Failed to install npm dependencies:", exc)
 
