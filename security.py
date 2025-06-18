@@ -8,6 +8,9 @@ from contextlib import closing
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import socket
+import os
+from collections import defaultdict, deque
+import time
 from pathlib import Path
 import subprocess
 import shutil
@@ -24,6 +27,10 @@ ROOT_DIR = Path(__file__).parent
 class SecureHandler(SimpleHTTPRequestHandler):
     """HTTP handler that injects security headers for every response."""
 
+    RATE_LIMIT = 5
+    WINDOW = 1  # seconds
+    _requests: dict[str, deque] = defaultdict(deque)
+
     def end_headers(self) -> None:  # type: ignore[override]
         self.send_header(
             "Content-Security-Policy",
@@ -34,7 +41,38 @@ class SecureHandler(SimpleHTTPRequestHandler):
         self.send_header("X-Frame-Options", "DENY")
         self.send_header("Cross-Origin-Opener-Policy", "same-origin")
         self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
+        self.send_header(
+            "Strict-Transport-Security",
+            "max-age=63072000; includeSubDomains; preload",
+        )
+        self.send_header("Permissions-Policy", "geolocation=()")
+        self.send_header("X-XSS-Protection", "1; mode=block")
         super().end_headers()
+
+    def _check_rate_limit(self) -> bool:
+        ip = self.client_address[0]
+        now = time.time()
+        q = self._requests[ip]
+        q.append(now)
+        while q and now - q[0] > self.WINDOW:
+            q.popleft()
+        if len(q) > self.RATE_LIMIT:
+            self.send_response(429)
+            self.send_header("Retry-After", str(self.WINDOW))
+            self.end_headers()
+            self.wfile.write(b"Too Many Requests")
+            return True
+        return False
+
+    def do_GET(self) -> None:  # type: ignore[override]
+        if self._check_rate_limit():
+            return
+        super().do_GET()
+
+    def do_HEAD(self) -> None:  # type: ignore[override]
+        if self._check_rate_limit():
+            return
+        super().do_HEAD()
 
 
 def _ensure_node_deps() -> None:
@@ -160,12 +198,13 @@ def _find_free_port(start: int = 8000) -> int:
 def main() -> None:
     _ensure_node_deps()
     compile_scss()
-    port = _find_free_port()
+    port = int(os.environ.get("PORT", _find_free_port()))
     handler = partial(SecureHandler, directory=ROOT_DIR)
     with ThreadingHTTPServer(("localhost", port), handler) as httpd:
         url = f"http://localhost:{port}/"
         print(f"Serving {ROOT_DIR} at {url}")
-        webbrowser.open_new_tab(url)
+        if os.environ.get("NO_BROWSER") != "1":
+            webbrowser.open_new_tab(url)
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:

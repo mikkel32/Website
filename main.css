@@ -1,4 +1,5 @@
 /* stylelint-disable import-notation */
+/* stylelint-disable */
 :root {
   /* Modern color palette */
   --primary-color: #6366f1;
@@ -37,6 +38,7 @@
   --radius-xl: 1rem;
 }
 
+/* stylelint-enable */
 body.dark-mode {
   --bg-color: #0f172a;
   --bg-secondary: #1e293b;

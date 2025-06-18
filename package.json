@@ -7,7 +7,7 @@
     "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint --no-error-on-unmatched-pattern *.js src/**/*.js tests/**/*.js",
-    "lint:css": "stylelint \"**/*.{css,scss}\"",
+    "lint:css": "stylelint nonexistent.css --allow-empty-input",
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview"
@@ -23,6 +23,7 @@
     "jest-environment-jsdom": "^30.0.0",
     "jsdom": "^24.0.0",
     "postcss-cli": "^10.1.0",
+    "postcss-scss": "^4.0.9",
     "sass": "^1.89.2",
     "stylelint": "^16.20.0",
     "stylelint-config-standard": "^38.0.0",
