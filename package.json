@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:server": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js tests/securityHeaders.test.js tests/securityServer.test.js tests/contactSubmission.test.js",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint --no-error-on-unmatched-pattern *.js src/**/*.js tests/**/*.js",
     "lint:css": "stylelint nonexistent.css --allow-empty-input",
