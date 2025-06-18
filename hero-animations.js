@@ -63,4 +63,21 @@ export async function initHeroAnimations() {
     delay: 600,
     easing: 'easeOutBack',
   });
+
+  animate('.hero-shapes .shape', {
+    opacity: [0, 0.6],
+    scale: [0.8, 1],
+    rotate: [-90, 0],
+    delay: stagger(150, { start: 500 }),
+    duration: 1000,
+    easing: 'easeOutBack',
+  });
+
+  animate('.hero-shapes .shape', {
+    translateX: [0, 30],
+    direction: 'alternate',
+    loop: true,
+    easing: 'easeInOutSine',
+    delay: stagger(200, { start: 1200 }),
+  });
 }
