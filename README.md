@@ -25,7 +25,7 @@ npm install -g sass
 ```
 
 ```bash
-npm install   # install dependencies such as Anime.js
+npm install   # install dependencies such as Anime.js, fonts and icons
 python security.py
 ```
 
@@ -33,6 +33,7 @@ Run `npm install` before any `npm test` or `python security.py` command to
 ensure all dependencies are available.
 
 If dependencies are missing, scripts like the hero animations may fail to load
+or styles may not find the Poppins font and Font Awesome icons
 (resulting in 404 errors for files under `node_modules`). The `security.py`
 server automatically attempts to run `npm install` when these packages are not
 found. Running `npm install` manually beforehand is still recommended to speed

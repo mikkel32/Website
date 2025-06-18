@@ -184,15 +184,31 @@ class SecureHandler(SimpleHTTPRequestHandler):
 
 
 def _ensure_node_deps() -> None:
-    """Install Node dependencies if ``animejs`` is missing."""
+    """Install Node dependencies if required assets are missing."""
     anime_path = ROOT_DIR / "node_modules" / "animejs" / "lib" / "anime.esm.js"
-    if anime_path.exists():
+    poppins_path = (
+        ROOT_DIR
+        / "node_modules"
+        / "@fontsource"
+        / "poppins"
+        / "index.css"
+    )
+    fa_path = (
+        ROOT_DIR
+        / "node_modules"
+        / "@fortawesome"
+        / "fontawesome-free"
+        / "css"
+        / "all.min.css"
+    )
+
+    if anime_path.exists() and poppins_path.exists() and fa_path.exists():
         return
 
     npm_cmd = shutil.which("npm") or shutil.which("npm.cmd")
     if not npm_cmd:
         print(
-            "Anime.js dependency missing and npm not found. "
+            "Required Node dependencies missing and npm not found. "
             "Install Node.js and run 'npm install' manually."
         )
         return
