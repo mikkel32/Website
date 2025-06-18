@@ -1,4 +1,6 @@
-import anime from 'animejs/lib/anime.es.js';
+// Import Anime.js from the local node_modules directory so the script works
+// when served by a simple HTTP server without a bundler.
+import anime from './node_modules/animejs/lib/anime.es.js';
 
 export function initHeroAnimations() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
