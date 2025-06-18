@@ -84,6 +84,8 @@ def compile_scss() -> None:
     """Compile SCSS sources to CSS using either Node or the Python sass lib."""
     scss = ROOT_DIR / "src" / "styles" / "main.scss"
     css = ROOT_DIR / "main.css"
+    dash_scss = ROOT_DIR / "src" / "styles" / "dashboard.scss"
+    dash_css = ROOT_DIR / "dashboard" / "dashboard.css"
 
     npx_cmd = shutil.which("npx") or shutil.which("npx.cmd")
     if npx_cmd:
@@ -92,7 +94,12 @@ def compile_scss() -> None:
                 [npx_cmd, "--yes", "sass", scss.as_posix(), css.as_posix()],
                 check=True,
             )
+            subprocess.run(
+                [npx_cmd, "--yes", "sass", dash_scss.as_posix(), dash_css.as_posix()],
+                check=True,
+            )
             _run_postcss(css)
+            _run_postcss(dash_css)
             return
         except subprocess.CalledProcessError as exc:
             print("Failed to compile SCSS with npx:", exc)
@@ -109,7 +116,9 @@ def compile_scss() -> None:
     if pysass is not None:
         try:
             css.write_text(pysass.compile(filename=scss.as_posix()))
+            dash_css.write_text(pysass.compile(filename=dash_scss.as_posix()))
             _run_postcss(css)
+            _run_postcss(dash_css)
             return
         except Exception as exc:  # pylint: disable=broad-except
             print("Failed to compile SCSS with python sass:", exc)

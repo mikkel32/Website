@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { initDashboard } from '../dashboard.js';
+import { initDashboard } from '../dashboard/core.js';
 
 describe('initDashboard', () => {
   test('captures console errors', () => {

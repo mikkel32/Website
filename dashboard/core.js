@@ -156,18 +156,27 @@ export function initDashboard(options = {}) {
 
   const stored = (() => {
     try {
-      return JSON.parse(localStorage.getItem('sgLogs')) || { logs: [], fetches: [] };
+      const data = JSON.parse(localStorage.getItem('sgLogs'));
+      if (data && data.version === 2) return data;
+      return null;
     } catch {
-      return { logs: [], fetches: [] };
+      return null;
     }
   })();
-  stored.logs.forEach((l) => {
-    appendLog(l.type, l.message);
-    if (l.type === 'error') errors += 1;
-    else if (l.type === 'warning') warnings += 1;
-  });
-  stored.fetches.forEach((f) => addFetchEntry(f));
-  if (stored.logs.length || stored.fetches.length) {
+
+  if (stored) {
+    ['error', 'warning', 'info'].forEach((t) => {
+      (stored.logs[t] || []).forEach((l) => {
+        appendLog(t, l.message);
+        if (t === 'error') errors += 1;
+        else if (t === 'warning') warnings += 1;
+      });
+    });
+    ['success', 'failure'].forEach((t) => {
+      (stored.fetches[t] || []).forEach((f) => addFetchEntry(f));
+    });
+  }
+  if (stored) {
     report();
   }
 

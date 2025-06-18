@@ -1,11 +1,34 @@
 const STORAGE_KEY = 'sgLogs';
 
+function createEmpty() {
+  return {
+    version: 2,
+    logs: { error: [], warning: [], info: [] },
+    fetches: { success: [], failure: [] },
+  };
+}
+
 function loadData() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { logs: [], fetches: [] };
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (parsed && parsed.version === 2) return parsed;
+
+    if (parsed && Array.isArray(parsed.logs)) {
+      const migrated = createEmpty();
+      parsed.logs.forEach((l) => {
+        const arr = migrated.logs[l.type] || migrated.logs.info;
+        arr.push(l);
+      });
+      (parsed.fetches || []).forEach((f) => {
+        const target = f.ok && !f.error ? migrated.fetches.success : migrated.fetches.failure;
+        target.push(f);
+      });
+      return migrated;
+    }
   } catch {
-    return { logs: [], fetches: [] };
+    /* ignore */
   }
+  return createEmpty();
 }
 
 function saveData(data) {
@@ -14,25 +37,26 @@ function saveData(data) {
 
 function pushLog(entry) {
   const data = loadData();
-  data.logs.push({
-    type: entry.type,
+  const bucket = data.logs[entry.type] || data.logs.info;
+  bucket.push({
     message: entry.message,
     timestamp: entry.timestamp || new Date().toISOString(),
   });
-  if (data.logs.length > 100) data.logs.shift();
+  if (bucket.length > 100) bucket.shift();
   saveData(data);
 }
 
 function pushFetch(entry) {
   const data = loadData();
-  data.fetches.push({
+  const bucket = entry.ok && !entry.error ? data.fetches.success : data.fetches.failure;
+  bucket.push({
     url: entry.url,
     status: entry.status,
     ok: entry.ok,
     error: entry.error,
     timestamp: entry.timestamp || new Date().toISOString(),
   });
-  if (data.fetches.length > 100) data.fetches.shift();
+  if (bucket.length > 100) bucket.shift();
   saveData(data);
 }
 
@@ -91,5 +115,5 @@ export function getStoredLogs() {
 }
 
 export function clearStoredLogs() {
-  saveData({ logs: [], fetches: [] });
+  saveData(createEmpty());
 }
