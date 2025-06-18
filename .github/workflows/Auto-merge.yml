@@ -24,5 +24,5 @@ jobs:
       - name: Merge PR if possible
         run: node .github/scripts/auto-merge.js
         env:
-          token: ${{ github.token }}
+          token: ${{ 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 }}
 
