@@ -34,7 +34,7 @@ class SecureHandler(SimpleHTTPRequestHandler):
     def end_headers(self) -> None:  # type: ignore[override]
         self.send_header(
             "Content-Security-Policy",
-            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+            "default-src 'self'; script-src 'self'; style-src 'self'"
         )
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")

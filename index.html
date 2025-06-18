@@ -7,13 +7,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&amp;display=swap" integrity="sha384-5iLhiAMnxM+tvsp4jKxMYmpKxvZL42MW4uVufHht0BVlXYOb0CXts5eEkK9wJ+nI" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
   <link rel="stylesheet" href="main.css">
-  <script type="importmap">
-    {
-      "imports": {
-        "animejs": "./node_modules/animejs/lib/anime.esm.js"
-      }
-    }
-  </script>
+  <script type="importmap" src="importmap.json"></script>
 </head>
 <body class="no-scroll">
   <div id="preloader">
@@ -244,11 +238,6 @@
     </div>
   </div>
 
-  <script>
-    if (location.protocol === 'file:') {
-      document.body.innerHTML = '<p style="padding:2rem;font-size:1.2rem">Please run this site via a local server (e.g., <code>python security.py</code>) to avoid CORS issues.</p>';
-    }
-  </script>
   <script type="module" src="main.js"></script>
 </body>
 </html>

@@ -37,6 +37,11 @@ up startup and ensure the necessary modules are available when the page loads.
 
 This starts a local web server and automatically opens the site in your browser. Using a server avoids CORS restrictions that occur when opening `index.html` directly from the file system. Running `npm install` ensures the required modules are available when the page loads.
 
+The development server also sends a strict Content Security Policy and
+`Strict-Transport-Security` header. Inline scripts and styles are blocked, so
+all code is loaded from external files. This mirrors a hardened production setup
+and helps catch policy violations during development.
+
 Alternatively you can use the development server provided by Vite (requires Node.js and dependencies):
 
 ```bash
