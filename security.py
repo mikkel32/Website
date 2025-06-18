@@ -9,7 +9,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import socket
 import os
-from collections import defaultdict, deque
+
 import time
 from pathlib import Path
 import subprocess
@@ -61,20 +61,21 @@ def sanitize_text(text: str) -> str:
 
 
 class RateLimiter:
-    """Track request counts per IP within a sliding time window."""
+    """Track simple request counts per IP within a fixed time window."""
 
     def __init__(self, limit: int, window: int) -> None:
         self.limit = limit
         self.window = window
-        self._requests: dict[str, deque] = defaultdict(deque)
+        self._counters: dict[str, tuple[int, float]] = {}
 
     def exceeded(self, ip: str) -> bool:
         now = time.time()
-        q = self._requests[ip]
-        q.append(now)
-        while q and now - q[0] > self.window:
-            q.popleft()
-        return len(q) > self.limit
+        count, start = self._counters.get(ip, (0, now))
+        if now - start > self.window:
+            count, start = 0, now
+        count += 1
+        self._counters[ip] = (count, start)
+        return count > self.limit
 
 
 class SecureHandler(SimpleHTTPRequestHandler):

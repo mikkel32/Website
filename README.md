@@ -42,6 +42,23 @@ The development server also sends a strict Content Security Policy and
 all code is loaded from external files. This mirrors a hardened production setup
 and helps catch policy violations during development.
 
+## Rate limiting
+
+`security.py` includes a lightweight rate limiter that counts requests per IP
+address. When a client exceeds the allowed number of requests within the
+configured time window, the server responds with **HTTP 429 Too Many Requests**.
+
+The defaults allow **5** requests every **1** second. You can adjust these
+limits by setting the environment variables `MAX_REQUESTS` and `RATE_WINDOW`:
+
+```bash
+MAX_REQUESTS=10 RATE_WINDOW=2 python security.py
+```
+
+The example above permits ten requests from the same IP within a two second
+window before subsequent requests are rejected. The `Retry-After` header of the
+response indicates how long clients should wait before retrying.
+
 Alternatively you can use the development server provided by Vite (requires Node.js and dependencies):
 
 ```bash
