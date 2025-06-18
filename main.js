@@ -115,12 +115,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function refreshToken() {
       try {
         const res = await fetch('/csrf-token');
-        const data = await res.json();
-        tokenInput.value = data.token;
-        sessionStorage.setItem('csrfToken', data.token);
+        if (res.ok) {
+          const data = await res.json();
+          tokenInput.value = data.token;
+          sessionStorage.setItem('csrfToken', data.token);
+          return;
+        }
       } catch {
-        notifications.show('Failed to obtain security token', 'error');
+        // ignore network failures and fall back to generated token
       }
+      const fallback = getCSRFToken();
+      tokenInput.value = fallback;
+      notifications.show('Using local security token', 'info');
     }
 
     await refreshToken();
