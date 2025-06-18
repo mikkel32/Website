@@ -39,6 +39,7 @@
         <li><a href="#services">Services</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#dashboard">Dashboard</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
       <button class="search-toggle" aria-label="Open search" aria-haspopup="dialog" aria-controls="searchOverlay" aria-expanded="false">
@@ -184,6 +185,23 @@
     </div>
   </div>
 </section>
+
+  <section id="dashboard" class="dashboard">
+    <div class="container">
+      <h2 class="section-title">Diagnostics Dashboard</h2>
+      <p class="dashboard-intro">Monitor console errors and network connections in real time.</p>
+      <div class="dashboard-grid">
+        <div class="dashboard-panel">
+          <h3>Console Logs</h3>
+          <ul id="dashboardLogs" class="log-list"></ul>
+        </div>
+        <div class="dashboard-panel">
+          <h3>Network Activity</h3>
+          <ul id="fetchLogs" class="tree-list"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
   <section id="contact" class="contact">
     <div class="container">
       <h2 class="section-title">Get In Touch</h2>

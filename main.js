@@ -4,11 +4,13 @@ import { NotificationSystem, initNotificationToggle } from './notifications.js';
 import { setupSecurityDemo, securityFeatures } from './security-demo.js';
 import { validateForm } from './utils.js';
 import { initHeroAnimations } from './hero-animations.js';
+import { initDashboard } from './dashboard.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   const navMenu = initNavigation();
   await initHeroAnimations();
+  initDashboard();
 
   const counters = document.querySelectorAll('.stat-number');
   const speed = 200;
