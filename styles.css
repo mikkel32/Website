@@ -687,6 +687,7 @@ body.dark-mode footer {
   box-shadow: 0 6px 20px rgb(0 0 0 / 30%);
 }
 
+
 /* Security Demo Section */
 .security-demo {
   padding: 5rem 0;
@@ -762,9 +763,59 @@ body.dark-mode .demo-card {
   border-radius: 4px;
 }
 
+
 .strength-text {
   font-weight: 600;
   text-align: center;
+}
+
+/* Contact Section */
+.contact {
+  padding: 5rem 0;
+  background: var(--bg-color);
+}
+
+.contact-form {
+  display: grid;
+  gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.contact-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-form label {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.contact-form textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.contact-form input,
+.contact-form textarea {
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.contact-form input.error,
+.contact-form textarea.error {
+  border-color: var(--danger-color);
 }
 
 /* Notification System */

@@ -176,6 +176,19 @@ document.addEventListener('DOMContentLoaded', () => {
     strengthText.textContent = strength.text;
     strengthText.style.color = strength.color;
   });
+
+  const contactForm = document.getElementById('contactForm');
+  if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (validateForm(contactForm)) {
+        notifications.show('Message sent!', 'success');
+        contactForm.reset();
+      } else {
+        notifications.show('Please fill out all required fields.', 'error');
+      }
+    });
+  }
 });
 
 // Form Validation (if you add a contact form)
