@@ -865,7 +865,8 @@ body.dark-mode .demo-card {
 }
 
 /* Dashboard Section */
-.dashboard {
+.dashboard,
+.dashboard-page {
   padding: 5rem 0;
   background: var(--bg-color);
 }
@@ -897,6 +898,27 @@ body.dark-mode .demo-card {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+}
+
+.log-search {
+  padding: 0.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-color);
+}
+
+.panel-toggle {
+  cursor: pointer;
+}
+
+.dashboard-panel.collapsed {
+  max-height: 2.5rem;
+  overflow: hidden;
+}
+
+.dashboard-panel.collapsed > :not(.dashboard-panel-header) {
+  display: none;
 }
 
 .log-filter {

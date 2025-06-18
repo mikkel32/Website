@@ -29,13 +29,21 @@ document.addEventListener('DOMContentLoaded', () => {
     errorsEl: document.getElementById('errorsCount'),
     warningsEl: document.getElementById('warningsCount'),
     requestsEl: document.getElementById('requestsCount'),
+    successesEl: document.getElementById('successCount'),
+    failuresEl: document.getElementById('failuresCount'),
   };
 
   initDashboard({
+    searchInputEl: '#logSearch',
+    panelToggleSel: '.panel-toggle',
+    pauseBtnEl: '#pauseLogs',
+    exportBtnEl: '#exportLogs',
     onStats({ errors, warnings, requests, successes, failures }) {
       if (stats.errorsEl) stats.errorsEl.textContent = errors;
       if (stats.warningsEl) stats.warningsEl.textContent = warnings;
       if (stats.requestsEl) stats.requestsEl.textContent = requests;
+      if (stats.successesEl) stats.successesEl.textContent = successes;
+      if (stats.failuresEl) stats.failuresEl.textContent = failures;
       if (chart) {
         chart.data.datasets[0].data = [successes, failures];
         chart.update();
