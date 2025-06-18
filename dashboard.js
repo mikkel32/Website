@@ -105,6 +105,7 @@ export function initDashboard(options = {}) {
       failures = 0;
       logHistory.length = 0;
       fetchHistory.length = 0;
+      localStorage.removeItem('sgLogs');
       report();
     });
   }
@@ -124,6 +125,51 @@ export function initDashboard(options = {}) {
       logList.scrollTop = logList.scrollHeight;
     }
   };
+
+  const addFetchEntry = (entry) => {
+    const node = document.createElement('li');
+    node.innerHTML = `<span class="fetch-url">${entry.url}</span>`;
+    const children = document.createElement('ul');
+    node.appendChild(children);
+    fetchTree.appendChild(node);
+    requests += 1;
+    if ('status' in entry) {
+      const statusItem = document.createElement('li');
+      statusItem.textContent = `Status: ${entry.status}`;
+      statusItem.className = entry.ok ? 'log-success' : 'log-error';
+      children.appendChild(statusItem);
+      if (entry.ok) {
+        successes += 1;
+      } else {
+        failures += 1;
+      }
+    }
+    if (entry.error) {
+      const errItem = document.createElement('li');
+      errItem.textContent = entry.error;
+      errItem.className = 'log-error';
+      children.appendChild(errItem);
+      failures += 1;
+    }
+    fetchHistory.push(entry);
+  };
+
+  const stored = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('sgLogs')) || { logs: [], fetches: [] };
+    } catch {
+      return { logs: [], fetches: [] };
+    }
+  })();
+  stored.logs.forEach((l) => {
+    appendLog(l.type, l.message);
+    if (l.type === 'error') errors += 1;
+    else if (l.type === 'warning') warnings += 1;
+  });
+  stored.fetches.forEach((f) => addFetchEntry(f));
+  if (stored.logs.length || stored.fetches.length) {
+    report();
+  }
 
   const origError = console.error;
   console.error = (...args) => {

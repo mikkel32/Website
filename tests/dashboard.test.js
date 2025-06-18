@@ -53,4 +53,18 @@ describe('initDashboard', () => {
     expect(logItems[1].textContent).toMatch('oops');
     expect(stats.errors).toBe(2);
   });
+
+  test('loads persisted logs from localStorage', async () => {
+    localStorage.clear();
+    await import('../error-capture.js');
+    console.log('persisted message');
+    document.body.innerHTML = `
+      <ul id="dashboardLogs" class="log-list"></ul>
+      <ul id="fetchLogs" class="tree-list"></ul>
+    `;
+    initDashboard();
+    const item = document.querySelector('.log-info');
+    expect(item).not.toBeNull();
+    expect(item.textContent).toMatch('persisted message');
+  });
 });
