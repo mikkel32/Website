@@ -947,6 +947,31 @@ body.dark-mode .dashboard-panel {
   color: var(--primary-color);
 }
 
+.dashboard-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.dashboard-stats .stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-stats .stat span {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.chart-container {
+  width: 100%;
+  max-width: 600px;
+  height: 300px;
+  margin: 0 auto 2rem;
+}
+
 /* Contact Section */
 .contact {
   padding: 5rem 0;
