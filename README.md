@@ -72,4 +72,10 @@ Resource failed to load: <URL>
 
 Opening the dashboard page will display these entries alongside other logs.
 
+The dashboard listens for custom `sg:log` and `sg:fetch` events dispatched by
+`error-capture.js`. This decouples the UI from the capture logic and allows
+other parts of the app to stream logs in real-time. The page provides global
+controls to collapse or expand all panels and uses `localStorage` to persist
+panel state and captured logs between visits.
+
 

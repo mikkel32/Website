@@ -61,6 +61,10 @@
       <div class="chart-container">
         <canvas id="networkChart" width="400" height="200"></canvas>
       </div>
+      <div class="dashboard-global-controls">
+        <button id="collapseAll" class="btn btn-small btn-secondary">Collapse All</button>
+        <button id="expandAll" class="btn btn-small btn-secondary">Expand All</button>
+      </div>
       <div class="dashboard-grid">
         <div class="dashboard-panel" id="logsPanel">
           <div class="dashboard-panel-header">
@@ -76,7 +80,7 @@
               <input type="text" id="logSearch" class="log-search" placeholder="Search logs" />
               <button id="pauseLogs" class="btn btn-small">Pause</button>
               <button id="exportLogs" class="btn btn-small btn-secondary">Export</button>
-              <button id="clearLogs" class="btn btn-small btn-secondary">Clear</button>
+              <button id="clearLogs" class="btn btn-small btn-danger">Clear</button>
               <button class="panel-toggle btn btn-small" aria-label="Collapse panel">Collapse</button>
             </div>
           </div>

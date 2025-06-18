@@ -1,16 +1,15 @@
 import { jest } from '@jest/globals';
-import { initDashboard } from '../dashboard/core.js';
 
 describe('initDashboard', () => {
-  test('captures console errors', () => {
+  test('captures console errors', async () => {
     document.body.innerHTML = `
       <ul id="dashboardLogs" class="log-list"></ul>
       <ul id="fetchLogs" class="tree-list"></ul>
     `;
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    localStorage.clear();
+    const { initDashboard } = await import('../dashboard/core.js');
     initDashboard();
     console.error('boom');
-    errorSpy.mockRestore();
     const li = document.querySelector('.log-error');
     expect(li).not.toBeNull();
     expect(li.textContent).toMatch('boom');
@@ -21,21 +20,24 @@ describe('initDashboard', () => {
       <ul id="dashboardLogs" class="log-list"></ul>
       <ul id="fetchLogs" class="tree-list"></ul>
     `;
-    global.fetch = jest.fn(() => Promise.reject(new Error('fail')));
+    localStorage.clear();
+    const { initDashboard } = await import('../dashboard/core.js');
     initDashboard();
-    await expect(fetch('http://x')).rejects.toThrow('fail');
-    const tree = document.querySelector('.tree-list li');
-    expect(tree).not.toBeNull();
-    const log = document.querySelector('.log-error');
-    expect(log).not.toBeNull();
+    window.dispatchEvent(
+      new CustomEvent('sg:fetch', { detail: { url: 'http://x', error: 'fail' } })
+    );
+    const list = document.querySelectorAll('.tree-list li');
+    expect(list.length).toBeGreaterThan(0);
   });
 
-  test('captures window errors and rejections', () => {
+  test('captures window errors and rejections', async () => {
     document.body.innerHTML = `
       <ul id="dashboardLogs" class="log-list"></ul>
       <ul id="fetchLogs" class="tree-list"></ul>
     `;
+    localStorage.clear();
     let stats = null;
+    const { initDashboard } = await import('../dashboard/core.js');
     initDashboard({ onStats: (s) => (stats = s) });
 
     window.dispatchEvent(new ErrorEvent('error', { message: 'kaboom' }));
@@ -62,6 +64,7 @@ describe('initDashboard', () => {
       <ul id="dashboardLogs" class="log-list"></ul>
       <ul id="fetchLogs" class="tree-list"></ul>
     `;
+    const { initDashboard } = await import('../dashboard/core.js');
     initDashboard();
     const item = document.querySelector('.log-info');
     expect(item).not.toBeNull();
