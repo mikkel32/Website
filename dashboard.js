@@ -83,7 +83,7 @@ export function initDashboard(options = {}) {
     }
   };
 
-  const updateVisibility = () => {
+  function updateVisibility() {
     const query = searchInput ? searchInput.value.toLowerCase() : '';
     Array.from(logList.children).forEach((li) => {
       let visible = logFilter === 'all' || li.dataset.type === logFilter;
