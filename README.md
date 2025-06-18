@@ -26,6 +26,10 @@ npm install   # install dependencies such as Anime.js
 python security.py
 ```
 
+If dependencies are missing, scripts like the hero animations may fail to load
+(resulting in 404 errors for files under `node_modules`). Running `npm install`
+ensures the necessary modules are available when the page loads.
+
 This starts a local web server and automatically opens the site in your browser. Using a server avoids CORS restrictions that occur when opening `index.html` directly from the file system. Running `npm install` ensures the required modules are available when the page loads.
 
 Alternatively you can use the development server provided by Vite (requires Node.js and dependencies):
