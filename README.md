@@ -13,7 +13,13 @@ is not installed the server will attempt to install it with `pip`.
 **Node.js is strongly recommended.** The Python fallback requires a working C/C++
 compiler and may fail on some platforms (for example Python 3.13 on Windows does
 not currently have prebuilt wheels). Installing [Node.js](https://nodejs.org)
-ensures SCSS compilation works out of the box.
+ensures SCSS compilation works out of the box. After installing Node.js,
+install the `sass` compiler globally so the server can compile SCSS without
+falling back to Python:
+
+```bash
+npm install -g sass
+```
 
 ```bash
 npm install   # install dependencies such as Anime.js
