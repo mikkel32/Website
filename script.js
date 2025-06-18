@@ -163,18 +163,49 @@ document.addEventListener('DOMContentLoaded', () => {
   addSecurityDemo();
   securityFeatures.init();
 
+  const notificationToggle = document.querySelector('.notification-toggle');
+  if (notificationToggle) {
+    const notifIcon = notificationToggle.querySelector('i');
+    notificationToggle.setAttribute('aria-pressed', notifications.enabled);
+    if (!notifications.enabled) {
+      notifIcon.classList.replace('fa-bell', 'fa-bell-slash');
+    }
+    notificationToggle.addEventListener('click', () => {
+      if (notifications.enabled) {
+        notifications.show('Notifications disabled', 'warning');
+      }
+      const enabled = notifications.toggle();
+      notifIcon.classList.toggle('fa-bell', enabled);
+      notifIcon.classList.toggle('fa-bell-slash', !enabled);
+      notificationToggle.setAttribute('aria-pressed', enabled);
+      if (enabled) {
+        notifications.show('Notifications enabled', 'success');
+      }
+    });
+  }
+
   const passwordInput = document.getElementById('passwordInput');
   const strengthBar = document.getElementById('strengthBar');
   const strengthText = document.getElementById('strengthText');
+  const strengthSuggestions = document.getElementById('strengthSuggestions');
 
   passwordInput.addEventListener('input', (e) => {
     const password = e.target.value;
     const strength = checkPasswordStrength(password);
 
-    strengthBar.style.width = `${strength.score * 25}%`;
+    strengthBar.style.width = `${strength.score * 20}%`;
     strengthBar.style.backgroundColor = strength.color;
     strengthText.textContent = strength.text;
     strengthText.style.color = strength.color;
+
+    if (strengthSuggestions) {
+      strengthSuggestions.innerHTML = '';
+      strength.suggestions.forEach((msg) => {
+        const li = document.createElement('li');
+        li.textContent = msg;
+        strengthSuggestions.appendChild(li);
+      });
+    }
   });
 
   const contactForm = document.getElementById('contactForm');
@@ -182,6 +213,11 @@ document.addEventListener('DOMContentLoaded', () => {
     contactForm.addEventListener('submit', (e) => {
       e.preventDefault();
       if (validateForm(contactForm)) {
+        const messageField = contactForm.querySelector('#message');
+        if (messageField && securityFeatures.scanInput(messageField.value)) {
+          notifications.show('Potentially malicious input detected', 'error');
+          return;
+        }
         notifications.show('Message sent!', 'success');
         contactForm.reset();
       } else {
@@ -236,7 +272,7 @@ function validateForm(form) {
     } else {
       input.classList.remove('error');
     }
-    
+
     // Email validation
     if (input.type === 'email') {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -244,6 +280,12 @@ function validateForm(form) {
         input.classList.add('error');
         isValid = false;
       }
+    }
+
+    if (securityFeatures.scanInput(input.value)) {
+      input.classList.add('error');
+      isValid = false;
+      notifications.show('Input appears malicious', 'error');
     }
   });
   
@@ -307,6 +349,7 @@ function addSecurityDemo() {
             <div class="strength-bar" id="strengthBar"></div>
           </div>
           <div class="strength-text" id="strengthText"></div>
+          <ul class="strength-suggestions" id="strengthSuggestions"></ul>
         </div>
       </div>
     </div>
@@ -339,13 +382,33 @@ window.encryptDemo = async function() {
 
 function checkPasswordStrength(password) {
   let score = 0;
-  const feedback = [];
+  const suggestions = [];
   
-  if (password.length >= 8) score++;
-  if (password.length >= 12) score++;
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
-  if (/\d/.test(password)) score++;
-  if (/[^a-zA-Z\d]/.test(password)) score++;
+  if (password.length >= 8) {
+    score++;
+  } else {
+    suggestions.push('Use at least 8 characters.');
+  }
+  if (password.length >= 12) {
+    score++;
+  } else {
+    suggestions.push('12+ characters improves security.');
+  }
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) {
+    score++;
+  } else {
+    suggestions.push('Mix uppercase and lowercase letters.');
+  }
+  if (/\d/.test(password)) {
+    score++;
+  } else {
+    suggestions.push('Add numbers.');
+  }
+  if (/[^a-zA-Z\d]/.test(password)) {
+    score++;
+  } else {
+    suggestions.push('Include special characters.');
+  }
   
   const strengths = [
     { score: 0, text: 'Very Weak', color: '#f44336' },
@@ -356,7 +419,7 @@ function checkPasswordStrength(password) {
     { score: 5, text: 'Very Strong', color: '#2e7d32' }
   ];
   
-  return strengths[score] || strengths[0];
+  return { ...(strengths[score] || strengths[0]), suggestions };
 }
 
 // Add notification system
@@ -365,9 +428,18 @@ class NotificationSystem {
     this.container = document.createElement('div');
     this.container.className = 'notification-container';
     document.body.appendChild(this.container);
+    this.enabled = localStorage.getItem('notifications') !== 'off';
+    this.maxVisible = 3;
   }
-  
+
+  toggle() {
+    this.enabled = !this.enabled;
+    localStorage.setItem('notifications', this.enabled ? 'on' : 'off');
+    return this.enabled;
+  }
+
   show(message, type = 'info') {
+    if (!this.enabled) return;
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -376,6 +448,9 @@ class NotificationSystem {
       <button class="notification-close">&times;</button>
     `;
     
+    if (this.container.children.length >= this.maxVisible) {
+      this.container.firstElementChild.remove();
+    }
     this.container.appendChild(notification);
     
     // Auto remove after 5 seconds
@@ -424,13 +499,6 @@ function closeSearch() {
   searchOverlay.setAttribute('aria-hidden', 'true');
   document.body.classList.remove('no-scroll');
 }
-
-// Simulate security alerts
-setInterval(() => {
-  if (Math.random() > 0.8) {
-    notifications.show('All systems secure', 'success');
-  }
-}, 30000);
 
 // Add keyboard shortcuts
 document.addEventListener('keydown', (e) => {
