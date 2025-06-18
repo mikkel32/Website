@@ -21,14 +21,23 @@ except Exception:  # ImportError or other issues
 ROOT_DIR = Path(__file__).parent
 
 def _install_python_sass() -> bool:
-    """Attempt to install the python ``sass`` module via pip."""
+    """Attempt to install the python ``sass`` module via pip without building."""
     try:
         subprocess.run(
-            [sys.executable, "-m", "pip", "install", "--user", "sass"],
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "--user",
+                "--only-binary",
+                ":all:",
+                "sass",
+            ],
             check=True,
         )
         return True
-    except Exception as exc:  # pylint: disable=broad-except
+    except (subprocess.CalledProcessError, OSError) as exc:
         print("Failed to auto-install python sass module:", exc)
         return False
 
@@ -66,7 +75,11 @@ def compile_scss() -> None:
             print("Failed to compile SCSS with python sass:", exc)
 
     if npx_cmd is None and pysass is None:
-        print("Failed to compile SCSS: npx command and python sass module missing")
+        print(
+            "Failed to compile SCSS: Node.js with npx was not found and the \"
+            "sass\" Python package is unavailable. Install Node.js from "
+            "https://nodejs.org/ or manually install a prebuilt \"sass\" wheel."
+        )
 
 
 def _find_free_port(start: int = 8000) -> int:
