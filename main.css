@@ -71,6 +71,10 @@ body {
   overflow: hidden;
 }
 
+section {
+  scroll-margin-top: 90px;
+}
+
 /* Navigation */
 .navbar {
   position: fixed;
