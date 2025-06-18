@@ -110,27 +110,66 @@ document.addEventListener('DOMContentLoaded', async () => {
     const tokenInput = document.createElement('input');
     tokenInput.type = 'hidden';
     tokenInput.name = 'csrf_token';
-    tokenInput.value = getCSRFToken();
     contactForm.appendChild(tokenInput);
 
-    contactForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (validateForm(contactForm)) {
-        const messageField = contactForm.querySelector('#message');
-        if (messageField && securityFeatures.scanInput(messageField.value)) {
-          notifications.show('Potentially malicious input detected', 'error');
-          return;
-        }
-        if (!validateCSRFToken(tokenInput.value)) {
-          notifications.show('Invalid session token', 'error');
-          return;
-        }
-        notifications.show('Message sent!', 'success');
-        tokenInput.value = getCSRFToken();
-        contactForm.reset();
-      } else {
-        notifications.show('Please fill out all required fields.', 'error');
+    async function refreshToken() {
+      try {
+        const res = await fetch('/csrf-token');
+        const data = await res.json();
+        tokenInput.value = data.token;
+        sessionStorage.setItem('csrfToken', data.token);
+      } catch {
+        notifications.show('Failed to obtain security token', 'error');
       }
+    }
+
+    await refreshToken();
+
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validateForm(contactForm)) {
+        notifications.show('Please fill out all required fields.', 'error');
+        return;
+      }
+
+      const messageField = contactForm.querySelector('#message');
+      if (messageField && securityFeatures.scanInput(messageField.value)) {
+        notifications.show('Potentially malicious input detected', 'error');
+        await refreshToken();
+        return;
+      }
+
+      if (!validateCSRFToken(tokenInput.value)) {
+        notifications.show('Invalid session token', 'error');
+        await refreshToken();
+        return;
+      }
+
+      const payload = {
+        name: contactForm.querySelector('#name').value,
+        email: contactForm.querySelector('#email').value,
+        message: messageField.value,
+        csrf_token: tokenInput.value,
+      };
+
+      try {
+        const response = await fetch('/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (response.ok && data.status === 'ok') {
+          notifications.show('Message sent!', 'success');
+          contactForm.reset();
+        } else {
+          notifications.show(data.message || 'Submission failed', 'error');
+        }
+      } catch {
+        notifications.show('Server error', 'error');
+      }
+
+      await refreshToken();
     });
   }
 

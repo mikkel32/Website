@@ -15,6 +15,11 @@ from pathlib import Path
 import subprocess
 import shutil
 import sys
+import urllib.parse
+import json
+import html
+import re
+from secrets import token_urlsafe
 
 try:
     import sass as pysass  # type: ignore
@@ -22,6 +27,37 @@ except Exception:  # ImportError or other issues
     pysass = None
 
 ROOT_DIR = Path(__file__).parent
+
+CSRF_TOKENS: dict[str, float] = {}
+TOKEN_TTL = 600  # seconds
+PATTERNS = [
+    re.compile(r"<script", re.I),
+    re.compile(r"select\b.*from", re.I),
+    re.compile(r"(\bor\b|\band\b).*=.*\b", re.I),
+    re.compile(r"drop\s+table", re.I),
+    re.compile(r"insert\s+into", re.I),
+    re.compile(r"delete\s+from", re.I),
+    re.compile(r"update\s+\w+\s+set", re.I),
+    re.compile(r"onerror\s*=", re.I),
+    re.compile(r"javascript:", re.I),
+]
+
+
+def generate_csrf_token() -> str:
+    token = token_urlsafe(16)
+    CSRF_TOKENS[token] = time.time() + TOKEN_TTL
+    return token
+
+
+def verify_csrf_token(token: str) -> bool:
+    expiry = CSRF_TOKENS.pop(token, None)
+    return bool(expiry and expiry > time.time())
+
+
+def sanitize_text(text: str) -> str:
+    if any(p.search(text) for p in PATTERNS):
+        raise ValueError("malicious input")
+    return html.escape(text, quote=True)
 
 
 class SecureHandler(SimpleHTTPRequestHandler):
@@ -67,12 +103,63 @@ class SecureHandler(SimpleHTTPRequestHandler):
     def do_GET(self) -> None:  # type: ignore[override]
         if self._check_rate_limit():
             return
+        if self.path == "/csrf-token":
+            token = generate_csrf_token()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"token": token}).encode())
+            return
         super().do_GET()
 
     def do_HEAD(self) -> None:  # type: ignore[override]
         if self._check_rate_limit():
             return
         super().do_HEAD()
+
+    def do_POST(self) -> None:  # type: ignore[override]
+        if self._check_rate_limit():
+            return
+        if self.path != "/contact":
+            self.send_response(404)
+            self.end_headers()
+            return
+        length = int(self.headers.get("Content-Length", 0))
+        data = self.rfile.read(length).decode("utf-8") if length else ""
+        ctype = self.headers.get("Content-Type", "")
+        if "application/json" in ctype:
+            try:
+                payload = json.loads(data)
+            except json.JSONDecodeError:
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b"Invalid JSON")
+                return
+        else:
+            params = urllib.parse.parse_qs(data)
+            payload = {k: v[0] if isinstance(v, list) else v for k, v in params.items()}
+
+        token = payload.get("csrf_token", "")
+        if not token or not verify_csrf_token(token):
+            self.send_response(403)
+            self.end_headers()
+            self.wfile.write(b"Invalid CSRF token")
+            return
+
+        try:
+            sanitize_text(str(payload.get("name", "")))
+            sanitize_text(str(payload.get("email", "")))
+            sanitize_text(str(payload.get("message", "")))
+        except ValueError:
+            self.send_response(400)
+            self.end_headers()
+            self.wfile.write(b"Malicious input")
+            return
+
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(b'{"status":"ok"}')
 
 
 def _ensure_node_deps() -> None:
