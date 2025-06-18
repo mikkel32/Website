@@ -53,6 +53,7 @@ npm run dev
 
 - `npm test` – run the Jest unit tests
 - `npm run lint` – run ESLint and Stylelint
+- `npm run audit` – check dependencies for vulnerabilities (fails on high severity)
 
 ## Project structure
 
@@ -83,4 +84,9 @@ other parts of the app to stream logs in real-time. The page provides global
 controls to collapse or expand all panels and uses `localStorage` to persist
 panel state and captured logs between visits.
 
+
+
+## Security auditing
+
+A GitHub Actions workflow automatically runs `npm audit` on every push and pull request. The build fails if any high-severity vulnerabilities are found. You can run the same check locally with `npm run audit`.
 
