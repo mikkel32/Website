@@ -35,29 +35,38 @@ function saveData(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
+function dispatchEvent(name, detail) {
+  const Ev = window.CustomEvent || CustomEvent;
+  window.dispatchEvent(new Ev(name, { detail }));
+}
+
 function pushLog(entry) {
   const data = loadData();
   const bucket = data.logs[entry.type] || data.logs.info;
-  bucket.push({
+  const item = {
     message: entry.message,
     timestamp: entry.timestamp || new Date().toISOString(),
-  });
+  };
+  bucket.push(item);
   if (bucket.length > 100) bucket.shift();
   saveData(data);
+  dispatchEvent('sg:log', { type: entry.type, ...item });
 }
 
 function pushFetch(entry) {
   const data = loadData();
   const bucket = entry.ok && !entry.error ? data.fetches.success : data.fetches.failure;
-  bucket.push({
+  const item = {
     url: entry.url,
     status: entry.status,
     ok: entry.ok,
     error: entry.error,
     timestamp: entry.timestamp || new Date().toISOString(),
-  });
+  };
+  bucket.push(item);
   if (bucket.length > 100) bucket.shift();
   saveData(data);
+  dispatchEvent('sg:fetch', item);
 }
 
 const origError = console.error;
@@ -116,4 +125,5 @@ export function getStoredLogs() {
 
 export function clearStoredLogs() {
   saveData(createEmpty());
+  dispatchEvent('sg:clear');
 }

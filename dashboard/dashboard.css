@@ -167,6 +167,15 @@ body {
   z-index: 1;
 }
 
+/* Global Controls */
+.dashboard-global-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
 /* Chart Container */
 .chart-container {
   background: var(--surface-color);
@@ -491,6 +500,13 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+.btn-danger {
+  background: var(--danger-color);
+  color: #fff;
+}
+.btn-danger:hover {
+  background: #dc2626;
+}
 /* Panel collapse states */
 .panel-toggle {
   transition: all var(--transition-fast);

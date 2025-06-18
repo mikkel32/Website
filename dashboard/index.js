@@ -37,6 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initDashboard({
     searchInputEl: '#logSearch',
     panelToggleSel: '.panel-toggle',
+    clearBtnEl: "#clearLogs",
+    collapseAllBtnEl: "#collapseAll",
+    expandAllBtnEl: "#expandAll",
     pauseBtnEl: '#pauseLogs',
     exportBtnEl: '#exportLogs',
     onStats({ errors, warnings, requests, successes, failures }) {

@@ -1,3 +1,4 @@
+import { getStoredLogs, clearStoredLogs } from "../error-capture.js";
 export function initDashboard(options = {}) {
   const logList = document.getElementById('dashboardLogs');
   const fetchTree = document.getElementById('fetchLogs');
@@ -20,6 +21,8 @@ export function initDashboard(options = {}) {
   const searchInput = document.querySelector(options.searchInputEl || '#logSearch');
   const panelToggles = document.querySelectorAll(options.panelToggleSel || '.panel-toggle');
 
+  const collapseAllBtn = document.querySelector(options.collapseAllBtnEl || "#collapseAll");
+  const expandAllBtn = document.querySelector(options.expandAllBtnEl || "#expandAll");
   const updateEmptyStates = () => {
     if (logsEmpty) logsEmpty.style.display = logList.children.length ? 'none' : 'block';
     if (fetchEmpty) fetchEmpty.style.display = fetchTree.children.length ? 'none' : 'block';
@@ -73,7 +76,7 @@ export function initDashboard(options = {}) {
     const panel = btn.closest('.dashboard-panel');
     if (!panel) return;
     const id = panel.id;
-    if (id && sessionStorage.getItem(`panel-${id}`) === 'collapsed') {
+    if (id && localStorage.getItem(`panel-${id}`) === 'collapsed') {
       panel.classList.add('collapsed');
       btn.textContent = 'Expand';
     }
@@ -81,11 +84,37 @@ export function initDashboard(options = {}) {
       const collapsed = panel.classList.toggle('collapsed');
       btn.textContent = collapsed ? 'Expand' : 'Collapse';
       if (id) {
-        sessionStorage.setItem(`panel-${id}`, collapsed ? 'collapsed' : 'open');
+        localStorage.setItem(`panel-${id}`, collapsed ? 'collapsed' : 'open');
       }
     });
   });
 
+  if (collapseAllBtn) {
+    collapseAllBtn.addEventListener("click", () => {
+      panelToggles.forEach((btn) => {
+        const panel = btn.closest(".dashboard-panel");
+        if (panel && !panel.classList.contains("collapsed")) {
+          panel.classList.add("collapsed");
+          btn.textContent = "Expand";
+          const id = panel.id;
+          if (id) localStorage.setItem(`panel-${id}`, "collapsed");
+        }
+      });
+    });
+  }
+  if (expandAllBtn) {
+    expandAllBtn.addEventListener("click", () => {
+      panelToggles.forEach((btn) => {
+        const panel = btn.closest(".dashboard-panel");
+        if (panel && panel.classList.contains("collapsed")) {
+          panel.classList.remove("collapsed");
+          btn.textContent = "Collapse";
+          const id = panel.id;
+          if (id) localStorage.setItem(`panel-${id}`, "open");
+        }
+      });
+    });
+  }
   const report = () => {
     if (typeof options.onStats === 'function') {
       options.onStats({ errors, warnings, requests, successes, failures });
@@ -114,7 +143,7 @@ export function initDashboard(options = {}) {
       failures = 0;
       logHistory.length = 0;
       fetchHistory.length = 0;
-      localStorage.removeItem('sgLogs');
+      clearStoredLogs();
       report();
       updateEmptyStates();
     });
@@ -166,16 +195,7 @@ export function initDashboard(options = {}) {
     updateEmptyStates();
   };
 
-  const stored = (() => {
-    try {
-      const data = JSON.parse(localStorage.getItem('sgLogs'));
-      if (data && data.version === 2) return data;
-      return null;
-    } catch {
-      return null;
-    }
-  })();
-
+  const stored = getStoredLogs();
   if (stored) {
     ['error', 'warning', 'info'].forEach((t) => {
       (stored.logs[t] || []).forEach((l) => {
@@ -193,84 +213,35 @@ export function initDashboard(options = {}) {
     report();
   }
 
-  const origError = console.error;
-  console.error = (...args) => {
-    if (recording) {
-      appendLog('error', args.join(' '));
+  window.addEventListener('sg:log', (e) => {
+    if (!recording) return;
+    const { type, message, timestamp } = e.detail;
+    appendLog(type, message, timestamp);
+    if (type === 'error') {
       errors += 1;
-      report();
-    }
-    origError.apply(console, args);
-  };
-
-  const origWarn = console.warn;
-  console.warn = (...args) => {
-    if (recording) {
-      appendLog('warning', args.join(' '));
+    } else if (type === 'warning') {
       warnings += 1;
-      report();
     }
-    origWarn.apply(console, args);
-  };
-
-  const origLog = console.log;
-  console.log = (...args) => {
-    if (recording) {
-      appendLog('info', args.join(' '));
-    }
-    origLog.apply(console, args);
-  };
-
-  window.addEventListener('error', (e) => {
-    if (!recording) return;
-    const msg = e.message || (e.error && e.error.message) || 'Unknown error';
-    appendLog('error', msg);
-    errors += 1;
     report();
   });
 
-  window.addEventListener('unhandledrejection', (e) => {
-    if (!recording) return;
-    const reason = e.reason && e.reason.message ? e.reason.message : e.reason;
-    appendLog('error', reason || 'Unhandled rejection');
-    errors += 1;
+  window.addEventListener('sg:fetch', (e) => {
+    const entry = e.detail;
+    addFetchEntry(entry);
     report();
   });
 
-  const origFetch = window.fetch;
-  window.fetch = async (...args) => {
-    const url = args[0];
-    requests += 1;
-    const node = document.createElement('li');
-    node.innerHTML = `<span class="fetch-url">${url}</span>`;
-    const children = document.createElement('ul');
-    node.appendChild(children);
-    fetchTree.appendChild(node);
-    try {
-      const res = await origFetch(...args);
-      const statusItem = document.createElement('li');
-      statusItem.textContent = `Status: ${res.status}`;
-      statusItem.className = res.ok ? 'log-success' : 'log-error';
-      children.appendChild(statusItem);
-      if (!res.ok) {
-        failures += 1;
-        if (recording) appendLog('error', `Fetch to ${url} failed with status ${res.status}`);
-      } else {
-        successes += 1;
-      }
-      fetchHistory.push({ url, status: res.status, ok: res.ok });
-      report();
-      return res;
-    } catch (err) {
-      const errItem = document.createElement('li');
-      errItem.textContent = err.toString();
-      errItem.className = 'log-error';
-      children.appendChild(errItem);
-      if (recording) appendLog('error', `Fetch to ${url} failed: ${err.message}`);
-      fetchHistory.push({ url, error: err.message });
-      failures += 1;
-      report();
-      throw err;
-    }
-  };
+  window.addEventListener('sg:clear', () => {
+    logList.innerHTML = '';
+    fetchTree.innerHTML = '';
+    errors = 0;
+    warnings = 0;
+    requests = 0;
+    successes = 0;
+    failures = 0;
+    logHistory.length = 0;
+    fetchHistory.length = 0;
+    updateEmptyStates();
+    report();
+  });
 }
