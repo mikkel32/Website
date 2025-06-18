@@ -13,10 +13,11 @@ Ensure you have Node.js installed or run `pip install sass` to enable the
 fallback compiler.
 
 ```bash
+npm install   # install dependencies such as Anime.js
 python security.py
 ```
 
-This starts a local web server and automatically opens the site in your browser. Using a server avoids CORS restrictions that occur when opening `index.html` directly from the file system.
+This starts a local web server and automatically opens the site in your browser. Using a server avoids CORS restrictions that occur when opening `index.html` directly from the file system. Running `npm install` ensures the required modules are available when the page loads.
 
 Alternatively you can use the development server provided by Vite (requires Node.js and dependencies):
 
