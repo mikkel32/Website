@@ -1,4 +1,4 @@
-/* stylelint-disable */
+/* stylelint-disable all */
 @use 'variables' as *;
 
 /* Base styles */
@@ -555,3 +555,4 @@ body {
     page-break-inside: avoid;
   }
 }
+/* stylelint-enable */
