@@ -1,4 +1,5 @@
 import { checkPasswordStrength } from './utils.js';
+import DOMPurify from 'dompurify';
 
 export const securityFeatures = {
   key: null,
@@ -104,7 +105,7 @@ export async function setupSecurityDemo(notifications) {
       const decrypted = await securityFeatures.decrypt(encrypted);
       result.innerHTML = `
         <p><strong>Encrypted:</strong> ${encrypted}</p>
-        <p><strong>Decrypted:</strong> ${decrypted}</p>
+        <p><strong>Decrypted:</strong> ${DOMPurify.sanitize(decrypted)}</p>
       `;
       result.style.display = 'block';
     }
