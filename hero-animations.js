@@ -4,13 +4,16 @@ let animeModule;
 
 async function loadAnime() {
   try {
-    animeModule = await import('animejs');
+    const res = await fetch('./node_modules/animejs/lib/anime.esm.js', { method: 'HEAD' });
+    if (res.ok) {
+      animeModule = await import('animejs');
+      return;
+    }
+    throw new Error('local file missing');
   } catch (err) {
     console.warn('Local Anime.js not found, loading from CDN...', err);
     try {
-      animeModule = await import(
-        'https://cdn.jsdelivr.net/npm/animejs@4.0.2/lib/anime.esm.min.js'
-      );
+      animeModule = await import('https://cdn.jsdelivr.net/npm/animejs@4.0.2/lib/anime.esm.min.js');
     } catch (cdnErr) {
       console.error('Failed to load Anime.js from CDN', cdnErr);
       animeModule = null;
