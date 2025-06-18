@@ -64,6 +64,12 @@
             <h3>Console Logs</h3>
             <div class="dashboard-controls">
               <label><input type="checkbox" id="autoScroll" checked /> Auto-scroll</label>
+              <select id="logFilter" class="log-filter">
+                <option value="all">All</option>
+                <option value="error">Errors</option>
+                <option value="warning">Warnings</option>
+                <option value="info">Info</option>
+              </select>
               <button id="clearLogs" class="btn btn-small btn-secondary">Clear</button>
             </div>
           </div>
