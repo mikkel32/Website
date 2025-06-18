@@ -12,31 +12,86 @@ export function initDashboard(options = {}) {
   const autoScrollBox =
     document.querySelector(options.autoScrollEl || '#autoScroll');
   const clearButton = document.querySelector(options.clearBtnEl || '#clearLogs');
+  const pauseButton = document.querySelector(options.pauseBtnEl || '#pauseLogs');
+  const exportButton = document.querySelector(options.exportBtnEl || '#exportLogs');
   const filterSelect = document.querySelector(options.filterSelectEl || '#logFilter');
+  const searchInput = document.querySelector(options.searchInputEl || '#logSearch');
+  const panelToggles = document.querySelectorAll(options.panelToggleSel || '.panel-toggle');
 
   let logFilter = filterSelect ? filterSelect.value : 'all';
 
   let autoScroll = !autoScrollBox || autoScrollBox.checked;
+  let recording = true;
+  const logHistory = [];
+  const fetchHistory = [];
   if (autoScrollBox) {
     autoScrollBox.addEventListener('change', () => {
       autoScroll = autoScrollBox.checked;
     });
   }
 
+  if (pauseButton) {
+    pauseButton.addEventListener('click', () => {
+      recording = !recording;
+      pauseButton.textContent = recording ? 'Pause' : 'Resume';
+    });
+  }
+
+  if (exportButton) {
+    exportButton.addEventListener('click', () => {
+      const data = { logs: logHistory, fetches: fetchHistory };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'dashboard_logs.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+  }
+
   if (filterSelect) {
     filterSelect.addEventListener('change', () => {
       logFilter = filterSelect.value;
-      Array.from(logList.children).forEach((li) => {
-        li.style.display =
-          logFilter === 'all' || li.dataset.type === logFilter ? '' : 'none';
-      });
+      updateVisibility();
     });
   }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', updateVisibility);
+  }
+
+  panelToggles.forEach((btn) => {
+    const panel = btn.closest('.dashboard-panel');
+    if (!panel) return;
+    const id = panel.id;
+    if (id && localStorage.getItem(`panel-${id}`) === 'collapsed') {
+      panel.classList.add('collapsed');
+      btn.textContent = 'Expand';
+    }
+    btn.addEventListener('click', () => {
+      const collapsed = panel.classList.toggle('collapsed');
+      btn.textContent = collapsed ? 'Expand' : 'Collapse';
+      if (id) {
+        localStorage.setItem(`panel-${id}`, collapsed ? 'collapsed' : 'open');
+      }
+    });
+  });
 
   const report = () => {
     if (typeof options.onStats === 'function') {
       options.onStats({ errors, warnings, requests, successes, failures });
     }
+  };
+
+  const updateVisibility = () => {
+    const query = searchInput ? searchInput.value.toLowerCase() : '';
+    Array.from(logList.children).forEach((li) => {
+      let visible = logFilter === 'all' || li.dataset.type === logFilter;
+      if (visible && query) {
+        visible = li.textContent.toLowerCase().includes(query);
+      }
+      li.style.display = visible ? '' : 'none';
+    });
   };
 
   if (clearButton) {
@@ -48,20 +103,23 @@ export function initDashboard(options = {}) {
       requests = 0;
       successes = 0;
       failures = 0;
+      logHistory.length = 0;
+      fetchHistory.length = 0;
       report();
     });
   }
 
   const appendLog = (type, message) => {
+    if (!recording) return;
     const li = document.createElement('li');
     li.className = `log-${type}`;
     li.dataset.type = type;
     const timestamp = new Date().toLocaleTimeString();
     li.innerHTML = `<span class="log-timestamp">${timestamp}</span> ${message}`;
-    if (logFilter !== 'all' && logFilter !== type) {
-      li.style.display = 'none';
-    }
+    li.style.display = 'none';
     logList.appendChild(li);
+    logHistory.push({ type, message, timestamp });
+    updateVisibility();
     if (autoScroll) {
       logList.scrollTop = logList.scrollHeight;
     }
@@ -69,23 +127,29 @@ export function initDashboard(options = {}) {
 
   const origError = console.error;
   console.error = (...args) => {
-    appendLog('error', args.join(' '));
-    errors += 1;
-    report();
+    if (recording) {
+      appendLog('error', args.join(' '));
+      errors += 1;
+      report();
+    }
     origError.apply(console, args);
   };
 
   const origWarn = console.warn;
   console.warn = (...args) => {
-    appendLog('warning', args.join(' '));
-    warnings += 1;
-    report();
+    if (recording) {
+      appendLog('warning', args.join(' '));
+      warnings += 1;
+      report();
+    }
     origWarn.apply(console, args);
   };
 
   const origLog = console.log;
   console.log = (...args) => {
-    appendLog('info', args.join(' '));
+    if (recording) {
+      appendLog('info', args.join(' '));
+    }
     origLog.apply(console, args);
   };
 
@@ -106,10 +170,11 @@ export function initDashboard(options = {}) {
       children.appendChild(statusItem);
       if (!res.ok) {
         failures += 1;
-        appendLog('error', `Fetch to ${url} failed with status ${res.status}`);
+        if (recording) appendLog('error', `Fetch to ${url} failed with status ${res.status}`);
       } else {
         successes += 1;
       }
+      fetchHistory.push({ url, status: res.status, ok: res.ok });
       report();
       return res;
     } catch (err) {
@@ -117,7 +182,8 @@ export function initDashboard(options = {}) {
       errItem.textContent = err.toString();
       errItem.className = 'log-error';
       children.appendChild(errItem);
-      appendLog('error', `Fetch to ${url} failed: ${err.message}`);
+      if (recording) appendLog('error', `Fetch to ${url} failed: ${err.message}`);
+      fetchHistory.push({ url, error: err.message });
       failures += 1;
       report();
       throw err;
