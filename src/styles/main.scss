@@ -1077,6 +1077,32 @@ body.dark-mode .search-box {
 }
 
 
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.reveal.in-view {
+  animation: fade-in-up 0.6s ease forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .hero-title,
+  .hero-subtitle,
+  .hero-buttons .btn,
+  .shield-animation {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+
+
 /* Responsive improvements */
 @media (width <= 480px) {
   .hero-title {
