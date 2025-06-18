@@ -1,22 +1,20 @@
 // Import Anime.js from the local node_modules directory so the script works
 // when served by a simple HTTP server without a bundler.
-import anime from './node_modules/animejs/lib/anime.es.js';
+import { animate, stagger } from 'animejs';
 
 export function initHeroAnimations() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     return;
   }
 
-  anime({
-    targets: '.hero-title',
+  animate('.hero-title', {
     opacity: [0, 1],
     translateY: [40, 0],
     duration: 700,
     easing: 'easeOutCubic',
   });
 
-  anime({
-    targets: '.hero-subtitle',
+  animate('.hero-subtitle', {
     opacity: [0, 1],
     translateY: [40, 0],
     duration: 700,
@@ -24,17 +22,15 @@ export function initHeroAnimations() {
     easing: 'easeOutCubic',
   });
 
-  anime({
-    targets: '.hero-buttons .btn',
+  animate('.hero-buttons .btn', {
     opacity: [0, 1],
     translateY: [40, 0],
-    delay: anime.stagger(100, { start: 400 }),
+    delay: stagger(100, { start: 400 }),
     duration: 600,
     easing: 'easeOutCubic',
   });
 
-  anime({
-    targets: '.shield-animation',
+  animate('.shield-animation', {
     opacity: [0, 1],
     scale: [0.8, 1],
     duration: 800,
