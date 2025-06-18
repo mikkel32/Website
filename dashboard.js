@@ -9,17 +9,45 @@ export function initDashboard(options = {}) {
   let successes = 0;
   let failures = 0;
 
+  const autoScrollBox =
+    document.querySelector(options.autoScrollEl || '#autoScroll');
+  const clearButton = document.querySelector(options.clearBtnEl || '#clearLogs');
+
+  let autoScroll = !autoScrollBox || autoScrollBox.checked;
+  if (autoScrollBox) {
+    autoScrollBox.addEventListener('change', () => {
+      autoScroll = autoScrollBox.checked;
+    });
+  }
+
   const report = () => {
     if (typeof options.onStats === 'function') {
       options.onStats({ errors, warnings, requests, successes, failures });
     }
   };
 
+  if (clearButton) {
+    clearButton.addEventListener('click', () => {
+      logList.innerHTML = '';
+      fetchTree.innerHTML = '';
+      errors = 0;
+      warnings = 0;
+      requests = 0;
+      successes = 0;
+      failures = 0;
+      report();
+    });
+  }
+
   const appendLog = (type, message) => {
     const li = document.createElement('li');
     li.className = `log-${type}`;
-    li.textContent = message;
+    const timestamp = new Date().toLocaleTimeString();
+    li.innerHTML = `<span class="log-timestamp">${timestamp}</span> ${message}`;
     logList.appendChild(li);
+    if (autoScroll) {
+      logList.scrollTop = logList.scrollHeight;
+    }
   };
 
   const origError = console.error;
@@ -36,6 +64,12 @@ export function initDashboard(options = {}) {
     warnings += 1;
     report();
     origWarn.apply(console, args);
+  };
+
+  const origLog = console.log;
+  console.log = (...args) => {
+    appendLog('info', args.join(' '));
+    origLog.apply(console, args);
   };
 
   const origFetch = window.fetch;

@@ -60,7 +60,13 @@
       </div>
       <div class="dashboard-grid">
         <div class="dashboard-panel">
-          <h3>Console Logs</h3>
+          <div class="dashboard-panel-header">
+            <h3>Console Logs</h3>
+            <div class="dashboard-controls">
+              <label><input type="checkbox" id="autoScroll" checked /> Auto-scroll</label>
+              <button id="clearLogs" class="btn btn-small btn-secondary">Clear</button>
+            </div>
+          </div>
           <ul id="dashboardLogs" class="log-list"></ul>
         </div>
         <div class="dashboard-panel">
