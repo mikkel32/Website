@@ -9,8 +9,22 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import socket
 from pathlib import Path
+import subprocess
 
 ROOT_DIR = Path(__file__).parent
+
+
+def compile_scss() -> None:
+    """Compile SCSS sources to CSS using the local sass binary."""
+    scss = ROOT_DIR / "src" / "styles" / "main.scss"
+    css = ROOT_DIR / "main.css"
+    try:
+        subprocess.run(
+            ["npx", "--yes", "sass", scss.as_posix(), css.as_posix()],
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        print("Failed to compile SCSS:", exc)
 
 
 def _find_free_port(start: int = 8000) -> int:
@@ -24,6 +38,7 @@ def _find_free_port(start: int = 8000) -> int:
 
 
 def main() -> None:
+    compile_scss()
     port = _find_free_port()
     handler = partial(SimpleHTTPRequestHandler, directory=ROOT_DIR)
     with ThreadingHTTPServer(("localhost", port), handler) as httpd:

@@ -1,38 +1,42 @@
-import { animate, stagger } from 'animejs';
+import anime from 'animejs/lib/anime.es.js';
 
 export function initHeroAnimations() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     return;
   }
 
-  animate('.hero-title', {
+  anime({
+    targets: '.hero-title',
     opacity: [0, 1],
     translateY: [40, 0],
     duration: 700,
-    ease: 'outCubic',
+    easing: 'easeOutCubic',
   });
 
-  animate('.hero-subtitle', {
+  anime({
+    targets: '.hero-subtitle',
     opacity: [0, 1],
     translateY: [40, 0],
     duration: 700,
     delay: 200,
-    ease: 'outCubic',
+    easing: 'easeOutCubic',
   });
 
-  animate('.hero-buttons .btn', {
+  anime({
+    targets: '.hero-buttons .btn',
     opacity: [0, 1],
     translateY: [40, 0],
-    delay: stagger(100, { start: 400 }),
+    delay: anime.stagger(100, { start: 400 }),
     duration: 600,
-    ease: 'outCubic',
+    easing: 'easeOutCubic',
   });
 
-  animate('.shield-animation', {
+  anime({
+    targets: '.shield-animation',
     opacity: [0, 1],
     scale: [0.8, 1],
     duration: 800,
     delay: 600,
-    ease: 'outBack',
+    easing: 'easeOutBack',
   });
 }
