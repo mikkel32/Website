@@ -51,6 +51,19 @@ describe('initTheme', () => {
 
     delete window.matchMedia;
   });
+
+  test('scrolling does not change navbar background', () => {
+    document.body.innerHTML = `
+      <button class="theme-toggle"><i class="fa fa-moon"></i></button>
+      <div class="navbar"></div>
+    `;
+    localStorage.clear();
+    initTheme();
+    const navbar = document.querySelector('.navbar');
+    const initialBackground = navbar.style.background;
+    window.dispatchEvent(new Event('scroll'));
+    expect(navbar.style.background).toBe(initialBackground);
+  });
 });
 
 describe('initNavigation', () => {

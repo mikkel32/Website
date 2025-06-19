@@ -3,6 +3,7 @@ export function initTheme() {
   const body = document.body;
   if (!themeToggle) return;
   const icon = themeToggle.querySelector('i');
+  const navbar = document.querySelector('.navbar');
   let theme = localStorage.getItem('theme');
 
   if (!theme) {
@@ -26,26 +27,24 @@ export function initTheme() {
     if (body.classList.contains('dark-mode')) {
       icon.classList.replace('fa-moon', 'fa-sun');
       localStorage.setItem('theme', 'dark');
+      if (navbar) {
+        navbar.style.background = 'rgb(15 23 42 / 60%)';
+      }
     } else {
       icon.classList.replace('fa-sun', 'fa-moon');
       localStorage.setItem('theme', 'light');
+      if (navbar) {
+        navbar.style.background = 'rgb(255 255 255 / 60%)';
+      }
     }
   });
 
-  const navbar = document.querySelector('.navbar');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 100) {
-      navbar.style.background = body.classList.contains('dark-mode')
-        ? 'rgba(18, 18, 18, 0.98)'
-        : 'rgba(255, 255, 255, 0.98)';
-      navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
-    } else {
-      navbar.style.background = body.classList.contains('dark-mode')
-        ? 'rgba(18, 18, 18, 0.95)'
-        : 'rgba(255, 255, 255, 0.95)';
-      navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-    }
-  });
+  if (navbar) {
+    navbar.style.background = body.classList.contains('dark-mode')
+      ? 'rgb(15 23 42 / 60%)'
+      : 'rgb(255 255 255 / 60%)';
+    navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+  }
 }
 
 export function initNavigation() {
