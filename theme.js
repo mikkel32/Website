@@ -3,10 +3,21 @@ export function initTheme() {
   const body = document.body;
   if (!themeToggle) return;
   const icon = themeToggle.querySelector('i');
-  const currentTheme = localStorage.getItem('theme');
-  if (currentTheme === 'dark') {
+  let theme = localStorage.getItem('theme');
+
+  if (!theme) {
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+    theme = prefersDark ? 'dark' : 'light';
+  }
+
+  if (theme === 'dark') {
     body.classList.add('dark-mode');
     icon.classList.replace('fa-moon', 'fa-sun');
+  } else {
+    body.classList.remove('dark-mode');
+    icon.classList.replace('fa-sun', 'fa-moon');
   }
 
   themeToggle.addEventListener('click', () => {
