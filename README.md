@@ -63,8 +63,8 @@ The example above permits ten requests from the same IP within a two second
 window before subsequent requests are rejected. The `Retry-After` header of the
 response indicates how long clients should wait before retrying.
 
-The default Content Security Policy now includes `img-src 'self' data:` so that
-local images and data URIs load without triggering browser CSP errors.
+The default Content Security Policy now includes `img-src 'self' data: https://images.unsplash.com` so that
+local images, data URIs, and the Unsplash images used in the demo load without triggering browser CSP errors.
 
 Alternatively you can use the development server provided by Vite (requires Node.js and dependencies):
 
