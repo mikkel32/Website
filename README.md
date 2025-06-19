@@ -46,6 +46,20 @@ The development server also sends a strict Content Security Policy and
 all code is loaded from external files. This mirrors a hardened production setup
 and helps catch policy violations during development.
 
+## Overriding the Content Security Policy
+
+The server looks for a `CONTENT_SECURITY_POLICY` environment variable and uses
+its value as the policy template. A `{nonce}` placeholder will automatically be
+replaced with a unique per-request nonce. This makes it possible to allow
+specific inline scripts while keeping the policy strict.
+
+```bash
+CONTENT_SECURITY_POLICY="default-src 'self'; img-src 'self' https://images.unsplash.com data:; script-src 'self' 'blob:' https://cdn.jsdelivr.net {nonce}; style-src 'self'" python security.py
+```
+
+The example above permits images from Unsplash and scripts from jsdelivr while
+retaining `default-src 'self'` for all other resources.
+
 ## Rate limiting
 
 `security.py` includes a lightweight rate limiter that counts requests per IP
