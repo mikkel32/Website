@@ -2,6 +2,7 @@
   "imports": {
     "animejs": "./node_modules/animejs/lib/anime.esm.js",
     "dompurify": "./node_modules/dompurify/dist/purify.es.mjs",
-    "chart.js/auto": "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/auto/auto.js"
+    "chart.js/auto": "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/auto/auto.js",
+    "@kurkle/color": "https://cdn.jsdelivr.net/npm/@kurkle/color@0.3.2/dist/color.esm.js"
   }
 }
