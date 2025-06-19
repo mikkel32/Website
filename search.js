@@ -23,6 +23,7 @@ export function initSearch(navMenu) {
     searchOverlay.setAttribute('aria-hidden', 'true');
     if (searchButton) {
       searchButton.setAttribute('aria-expanded', 'false');
+      searchButton.focus();
     }
     document.body.classList.remove('no-scroll');
   }

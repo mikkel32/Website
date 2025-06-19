@@ -67,4 +67,24 @@ describe('initSearch', () => {
     expect(searchOverlay.classList.contains('active')).toBe(false);
     expect(searchOverlay.getAttribute('aria-hidden')).toBe('true');
   });
+
+  test('returns focus to toggle when closing', () => {
+    document.body.innerHTML = `
+      <button class="search-toggle"></button>
+      <div id="searchOverlay" class="search-overlay" aria-hidden="true">
+        <div class="search-box">
+          <button class="search-close"></button>
+          <input id="searchInput" />
+          <ul id="searchResults"></ul>
+        </div>
+      </div>
+    `;
+    const navMenu = document.createElement('div');
+    initSearch(navMenu);
+    const searchButton = document.querySelector('.search-toggle');
+    const searchClose = document.querySelector('.search-close');
+    searchButton.click();
+    searchClose.click();
+    expect(document.activeElement).toBe(searchButton);
+  });
 });
