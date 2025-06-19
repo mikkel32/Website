@@ -4,6 +4,7 @@ import { initSearch } from '../search.js';
 import { NotificationSystem, initNotificationToggle } from '../notifications.js';
 import { initDashboard } from './core.js';
 import { initScrollOrb } from '../scroll-orb.js';
+const chartBundlePath = new URL('./chart.bundle.mjs', import.meta.url).href;
 
 let chartModulePromise = null;
 
@@ -22,13 +23,18 @@ async function setupChart() {
       return Chart;
     } catch {
       try {
-        const { default: Chart } = await import('https://esm.sh/chart.js@4.5.0?bundle');
+        const { default: Chart } = await import(chartBundlePath);
         return Chart;
       } catch {
-        console.error(
-          'Failed to load Chart.js. Ensure dependencies are installed or network access is available.'
-        );
-        return null;
+        try {
+          const { default: Chart } = await import('https://esm.sh/chart.js@4.5.0?bundle');
+          return Chart;
+        } catch {
+          console.error(
+            'Failed to load Chart.js. Ensure dependencies are installed or network access is available.'
+          );
+          return null;
+        }
       }
     }
   };

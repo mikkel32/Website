@@ -12,7 +12,8 @@
     "audit": "npm audit --production --audit-level=high",
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "update-chart": "node scripts/updateChartBundle.js"
   },
   "keywords": [],
   "author": "",
