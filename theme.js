@@ -54,11 +54,18 @@ export function initNavigation() {
   if (!navToggle || !navMenu) return navMenu;
   const spans = navToggle.querySelectorAll('span');
 
+  navToggle.setAttribute('aria-controls', navMenu.id);
+  navToggle.setAttribute(
+    'aria-expanded',
+    navMenu.classList.contains('active') ? 'true' : 'false',
+  );
+
   const closeMenu = () => {
     navMenu.classList.remove('active');
     spans[0].style.transform = '';
     spans[1].style.opacity = '1';
     spans[2].style.transform = '';
+    navToggle.setAttribute('aria-expanded', 'false');
     sessionStorage.removeItem('nav-state');
   };
 
@@ -67,6 +74,7 @@ export function initNavigation() {
     spans[0].style.transform = 'rotate(-45deg) translate(-5px, 6px)';
     spans[1].style.opacity = '0';
     spans[2].style.transform = 'rotate(45deg) translate(-5px, -6px)';
+    navToggle.setAttribute('aria-expanded', 'true');
     sessionStorage.setItem('nav-state', 'open');
   };
 

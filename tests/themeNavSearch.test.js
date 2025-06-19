@@ -54,18 +54,22 @@ describe('initTheme', () => {
 });
 
 describe('initNavigation', () => {
-  test('toggles nav menu active class', () => {
+  test('toggles nav menu active class and aria attributes', () => {
     document.body.innerHTML = `
-      <button class="nav-toggle"><span></span><span></span><span></span></button>
-      <ul class="nav-menu"><li><a href="#home">Home</a></li></ul>
+      <button class="nav-toggle" aria-controls="mainNav" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul id="mainNav" class="nav-menu"><li><a href="#home">Home</a></li></ul>
     `;
 
     const navMenu = initNavigation();
     const navToggle = document.querySelector('.nav-toggle');
+    expect(navToggle.getAttribute('aria-expanded')).toBe('false');
+    expect(navToggle.getAttribute('aria-controls')).toBe('mainNav');
     navToggle.click();
     expect(navMenu.classList.contains('active')).toBe(true);
+    expect(navToggle.getAttribute('aria-expanded')).toBe('true');
     navToggle.click();
     expect(navMenu.classList.contains('active')).toBe(false);
+    expect(navToggle.getAttribute('aria-expanded')).toBe('false');
   });
 });
 
