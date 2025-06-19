@@ -8,15 +8,20 @@ import { initScrollOrb } from '../scroll-orb.js';
 async function setupChart() {
   const ctx = document.getElementById('networkChart');
   if (!ctx) return null;
-  const { default: Chart } = await import('chart.js/auto');
-  return new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Success', 'Failed'],
-      datasets: [{ data: [0, 0], backgroundColor: ['#22c55e', '#ef4444'] }],
-    },
-    options: { responsive: true, maintainAspectRatio: false },
-  });
+  try {
+    const { default: Chart } = await import('chart.js/auto');
+    return new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Success', 'Failed'],
+        datasets: [{ data: [0, 0], backgroundColor: ['#22c55e', '#ef4444'] }],
+      },
+      options: { responsive: true, maintainAspectRatio: false },
+    });
+  } catch (err) {
+    console.error('Failed to load Chart.js', err);
+    return null;
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
