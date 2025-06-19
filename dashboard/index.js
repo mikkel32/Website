@@ -14,16 +14,11 @@ const CHART_CDN_HASH =
 
 async function loadChart() {
   if (chartModule) return;
-  const localPath = '../node_modules/chart.js/auto/auto.js';
   try {
-    const headRes = await fetch(localPath, { method: 'HEAD' });
-    if (headRes.ok && headRes.headers.get('content-type')?.includes('javascript')) {
-      chartModule = await import(localPath);
-      return;
-    }
-    console.warn('Local Chart.js not found, loading from CDN...');
+    chartModule = await import('chart.js/auto');
+    return;
   } catch (err) {
-    console.warn('Local Chart.js check failed, loading from CDN...', err);
+    console.warn('Local Chart.js failed, loading from CDN...', err);
   }
   try {
     const res = await fetch(CHART_CDN_URL);
