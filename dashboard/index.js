@@ -19,8 +19,22 @@ async function setupChart() {
       options: { responsive: true, maintainAspectRatio: false },
     });
   } catch (err) {
-    console.error('Failed to load Chart.js', err);
-    return null;
+    try {
+      const { default: Chart } = await import(
+        'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/auto/auto.js'
+      );
+      return new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Success', 'Failed'],
+          datasets: [{ data: [0, 0], backgroundColor: ['#22c55e', '#ef4444'] }],
+        },
+        options: { responsive: true, maintainAspectRatio: false },
+      });
+    } catch (err2) {
+      console.error('Failed to load Chart.js', err2);
+      return null;
+    }
   }
 }
 
