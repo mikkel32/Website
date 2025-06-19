@@ -19,15 +19,33 @@ async function setupChart() {
       options: { responsive: true, maintainAspectRatio: false },
     });
   } catch (err) {
+    console.error('Failed to load Chart.js', err);
     try {
-      const { default: Chart } = await import(
-        'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/auto/auto.js'
-      );
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src =
+          'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js';
+        script.crossOrigin = 'anonymous';
+        const fail = (msg) => {
+          console.error('Failed to load Chart.js', msg);
+          reject(new Error(msg));
+        };
+        script.onload = resolve;
+        script.onerror = () => fail('script error');
+        // In testing environments like JSDOM the load event will never fire, so
+        // provide an immediate timeout to ensure the promise settles.
+        setTimeout(() => fail('timeout'), 0);
+        document.head.appendChild(script);
+      });
+      const Chart = window.Chart;
+      if (!Chart) throw new Error('Chart not available');
       return new Chart(ctx, {
         type: 'doughnut',
         data: {
           labels: ['Success', 'Failed'],
-          datasets: [{ data: [0, 0], backgroundColor: ['#22c55e', '#ef4444'] }],
+          datasets: [
+            { data: [0, 0], backgroundColor: ['#22c55e', '#ef4444'] }
+          ],
         },
         options: { responsive: true, maintainAspectRatio: false },
       });
