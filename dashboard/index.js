@@ -11,7 +11,7 @@ async function setupChart() {
 
   const sources = [
     () => import('chart.js/auto'),
-    () => import('https://esm.sh/chart.js@4.5.0?bundle'),
+    () => import('https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.js'),
   ];
 
   let Chart = null;
@@ -19,8 +19,8 @@ async function setupChart() {
     try {
       ({ default: Chart } = await load());
       break;
-    } catch {
-      // try next source
+    } catch (err) {
+      console.warn('Chart.js load failed', err);
     }
   }
 

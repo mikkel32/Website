@@ -2,6 +2,6 @@
   "imports": {
     "animejs": "./node_modules/animejs/lib/anime.esm.js",
     "dompurify": "./node_modules/dompurify/dist/purify.es.mjs",
-    "chart.js/auto": "https://esm.sh/chart.js@4.5.0?bundle"
+    "chart.js/auto": "./node_modules/chart.js/auto/auto.js"
   }
 }
