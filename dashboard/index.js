@@ -8,34 +8,35 @@ import { initScrollOrb } from '../scroll-orb.js';
 async function setupChart() {
   const ctx = document.getElementById('networkChart');
   if (!ctx) return null;
-  try {
-    const { default: Chart } = await import('chart.js/auto');
-    return new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Success', 'Failed'],
-        datasets: [{ data: [0, 0], backgroundColor: ['#22c55e', '#ef4444'] }],
-      },
-      options: { responsive: true, maintainAspectRatio: false },
-    });
-  } catch (err) {
+
+  const sources = [
+    () => import('chart.js/auto'),
+    () => import('https://esm.sh/chart.js@4.5.0?bundle'),
+  ];
+
+  let Chart = null;
+  for (const load of sources) {
     try {
-      const { default: Chart } = await import(
-        'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/auto/auto.js'
-      );
-      return new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Success', 'Failed'],
-          datasets: [{ data: [0, 0], backgroundColor: ['#22c55e', '#ef4444'] }],
-        },
-        options: { responsive: true, maintainAspectRatio: false },
-      });
-    } catch (err2) {
-      console.error('Failed to load Chart.js', err2);
-      return null;
+      ({ default: Chart } = await load());
+      break;
+    } catch {
+      // try next source
     }
   }
+
+  if (!Chart) {
+    console.error('Failed to load Chart.js');
+    return null;
+  }
+
+  return new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Success', 'Failed'],
+      datasets: [{ data: [0, 0], backgroundColor: ['#22c55e', '#ef4444'] }],
+    },
+    options: { responsive: true, maintainAspectRatio: false },
+  });
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
