@@ -2,6 +2,8 @@ export class NotificationSystem {
   constructor() {
     this.container = document.createElement('div');
     this.container.className = 'notification-container';
+    this.container.setAttribute('aria-live', 'polite');
+    this.container.setAttribute('role', 'status');
     document.body.appendChild(this.container);
     this.enabled = localStorage.getItem('notifications') !== 'off';
     this.maxVisible = 3;
@@ -17,6 +19,7 @@ export class NotificationSystem {
     if (!this.enabled) return;
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
+    notification.setAttribute('role', 'alert');
     notification.innerHTML = `
       <i class="fas fa-${this.getIcon(type)}"></i>
       <span>${message}</span>
