@@ -8,7 +8,7 @@ import { initScrollOrb } from '../scroll-orb.js';
 async function setupChart() {
   const ctx = document.getElementById('networkChart');
   if (!ctx) return null;
-  const { default: Chart } = await import('../node_modules/chart.js/auto/auto.js');
+  const { default: Chart } = await import('chart.js/auto');
   return new Chart(ctx, {
     type: 'doughnut',
     data: {
