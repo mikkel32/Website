@@ -1,29 +1,55 @@
+import { jest } from '@jest/globals';
 import { initTheme, initNavigation } from '../theme.js';
 import { initSearch } from '../search.js';
 
 describe('initTheme', () => {
+  test('applies OS preference when no saved theme', () => {
+    document.body.innerHTML = `
+      <button class="theme-toggle"><i class="fa fa-moon"></i></button>
+      <div class="navbar"></div>
+    `;
+    localStorage.clear();
+    const originalMatch = window.matchMedia;
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      writable: true,
+      value: jest.fn().mockReturnValue({ matches: true })
+    });
+
+    initTheme();
+    expect(document.body.classList.contains('dark-mode')).toBe(true);
+    const icon = document.querySelector('.theme-toggle i');
+    expect(icon.classList.contains('fa-sun')).toBe(true);
+    expect(localStorage.getItem('theme')).toBeNull();
+
+    if (originalMatch === undefined) {
+      delete window.matchMedia;
+    } else {
+      window.matchMedia = originalMatch;
+    }
+  });
   test('toggles dark mode and persists setting', () => {
     document.body.innerHTML = `
       <button class="theme-toggle"><i class="fa fa-moon"></i></button>
       <div class="navbar"></div>
     `;
-    const storage = new Map();
-    Object.defineProperty(window, 'localStorage', {
+    localStorage.clear();
+    Object.defineProperty(window, 'matchMedia', {
       configurable: true,
-      value: {
-        getItem: (k) => storage.get(k),
-        setItem: (k, v) => storage.set(k, v)
-      }
+      writable: true,
+      value: () => ({ matches: false })
     });
 
     initTheme();
     const toggle = document.querySelector('.theme-toggle');
     toggle.click();
     expect(document.body.classList.contains('dark-mode')).toBe(true);
-    expect(storage.get('theme')).toBe('dark');
+    expect(localStorage.getItem('theme')).toBe('dark');
     toggle.click();
     expect(document.body.classList.contains('dark-mode')).toBe(false);
-    expect(storage.get('theme')).toBe('light');
+    expect(localStorage.getItem('theme')).toBe('light');
+
+    delete window.matchMedia;
   });
 });
 
