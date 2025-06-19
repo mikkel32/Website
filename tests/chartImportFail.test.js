@@ -7,7 +7,7 @@ jest.unstable_mockModule('chart.js/auto', () => {
 
 const loadDashboard = () => import('../dashboard/index.js');
 
-test('dashboard handles missing Chart.js gracefully', async () => {
+test('dashboard falls back to bundled Chart.js', async () => {
   document.body.innerHTML = `
     <canvas id="networkChart"></canvas>
     <ul id="dashboardLogs"></ul>
@@ -23,6 +23,6 @@ test('dashboard handles missing Chart.js gracefully', async () => {
   await loadDashboard();
   document.dispatchEvent(new Event('DOMContentLoaded'));
   await new Promise((r) => setTimeout(r, 0));
-  expect(errorSpy).toHaveBeenCalled();
+  expect(errorSpy).not.toHaveBeenCalled();
   errorSpy.mockRestore();
 });

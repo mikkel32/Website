@@ -124,7 +124,9 @@ other parts of the app to stream logs in real-time. The page provides global
 controls to collapse or expand all panels and uses `localStorage` to persist
 panel state and captured logs between visits.
 
-Chart.js powering the network activity visualization is loaded on demand when the dashboard initializes, reducing the amount of JavaScript downloaded on first load. The loader now tries the locally installed module first and falls back to a bundled version from [esm.sh](https://esm.sh/) if that fails, ensuring the chart still loads even when dependency resolution breaks.
+Chart.js powering the network activity visualization is loaded on demand when the dashboard initializes, reducing the amount of JavaScript downloaded on first load. The loader now tries the locally installed module first, then a bundled copy at `dashboard/chart.bundle.mjs` (mirrored under `public/dashboard` for production builds), and finally falls back to a version from [esm.sh](https://esm.sh/) if those fail. This guarantees the chart loads even when dependency resolution or network access break down.
+
+Run `npm run update-chart` anytime you want to refresh the bundled file with the latest Chart.js version.
 
 
 
