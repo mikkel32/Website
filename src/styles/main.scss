@@ -26,8 +26,10 @@ body {
   height: 120vmax;
   pointer-events: none;
   border-radius: 50%;
-  background: radial-gradient(circle at center, var(--orb-color-start), var(--orb-color-end) 60%, transparent 80%);
+  background: radial-gradient(circle at center, var(--orb-color-start), var(--orb-color-end) 70%, transparent 100%);
   transform: translate3d(-50%, -50%, 0);
+  filter: blur(80px);
+  opacity: 0.6;
   z-index: -1;
   will-change: transform;
 }
@@ -656,7 +658,9 @@ body.dark-mode footer {
 }
 
 body.dark-mode .scroll-orb {
-  background: radial-gradient(circle at center, var(--orb-color-start), var(--orb-color-end) 60%, transparent 80%);
+  background: radial-gradient(circle at center, var(--orb-color-start), var(--orb-color-end) 70%, transparent 100%);
+  filter: blur(80px);
+  opacity: 0.6;
 }
 
 /* Animations */

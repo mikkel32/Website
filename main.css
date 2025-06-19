@@ -7,7 +7,7 @@
   --primary-color: #7c3aed;
   --primary-dark: #4c1d95;
   --primary-light: #c4b5fd;
-  --accent-color: #ec4899;
+  --accent-color: #0ea5e9;
   --success-color: #10b981;
   --warning-color: #f59e0b;
   --danger-color: #ef4444;
@@ -84,8 +84,10 @@ body {
   height: 120vmax;
   pointer-events: none;
   border-radius: 50%;
-  background: radial-gradient(circle at center, var(--orb-color-start), var(--orb-color-end) 60%, transparent 80%);
+  background: radial-gradient(circle at center, var(--orb-color-start), var(--orb-color-end) 70%, transparent 100%);
   transform: translate3d(-50%, -50%, 0);
+  filter: blur(80px);
+  opacity: 0.6;
   z-index: -1;
   will-change: transform;
 }
@@ -707,7 +709,9 @@ body.dark-mode footer {
 }
 
 body.dark-mode .scroll-orb {
-  background: radial-gradient(circle at center, var(--orb-color-start), var(--orb-color-end) 60%, transparent 80%);
+  background: radial-gradient(circle at center, var(--orb-color-start), var(--orb-color-end) 70%, transparent 100%);
+  filter: blur(80px);
+  opacity: 0.6;
 }
 
 /* Animations */
