@@ -126,7 +126,7 @@ panel state and captured logs between visits.
 
 Chart.js powering the network activity visualization is loaded on demand when the dashboard initializes, reducing the amount of JavaScript downloaded on first load. The loader now tries the locally installed module first, then a bundled copy at `dashboard/chart.bundle.mjs` (mirrored under `public/dashboard` for production builds), and finally falls back to a version from [esm.sh](https://esm.sh/) if those fail. This guarantees the chart loads even when dependency resolution or network access break down.
 
-Run `npm run update-chart` anytime you want to refresh the bundled file with the latest Chart.js version.
+Run `npm run update-chart` anytime you want to refresh the bundled file with the latest Chart.js version. The script uses `curl` to download `?bundle` from esm.sh and writes it to both `dashboard/chart.bundle.mjs` and `public/dashboard/chart.bundle.mjs`.
 
 
 
