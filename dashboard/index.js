@@ -5,38 +5,48 @@ import { NotificationSystem, initNotificationToggle } from '../notifications.js'
 import { initDashboard } from './core.js';
 import { initScrollOrb } from '../scroll-orb.js';
 
+let chartModulePromise = null;
+
 async function setupChart() {
+  if (chartModulePromise) return chartModulePromise;
+
   const ctx = document.getElementById('networkChart');
-  if (!ctx) return null;
-
-  const sources = [
-    () => import('chart.js/auto'),
-    () => import('https://esm.sh/chart.js@4.5.0?bundle'),
-  ];
-
-  let Chart = null;
-  for (const load of sources) {
-    try {
-      ({ default: Chart } = await load());
-      break;
-    } catch {
-      // try next source
-    }
-  }
-
-  if (!Chart) {
-    console.error('Failed to load Chart.js');
+  if (!ctx) {
+    chartModulePromise = Promise.resolve(null);
     return null;
   }
 
-  return new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['Success', 'Failed'],
-      datasets: [{ data: [0, 0], backgroundColor: ['#22c55e', '#ef4444'] }],
-    },
-    options: { responsive: true, maintainAspectRatio: false },
+  const loadChart = async () => {
+    try {
+      const { default: Chart } = await import('chart.js/auto');
+      return Chart;
+    } catch {
+      try {
+        const { default: Chart } = await import('https://esm.sh/chart.js@4.5.0?bundle');
+        return Chart;
+      } catch {
+        console.error(
+          'Failed to load Chart.js. Ensure dependencies are installed or network access is available.'
+        );
+        return null;
+      }
+    }
+  };
+
+  chartModulePromise = loadChart().then((Chart) => {
+    return Chart
+      ? new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Success', 'Failed'],
+            datasets: [{ data: [0, 0], backgroundColor: ['#22c55e', '#ef4444'] }],
+          },
+          options: { responsive: true, maintainAspectRatio: false },
+        })
+      : null;
   });
+
+  return chartModulePromise;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
