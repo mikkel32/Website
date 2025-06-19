@@ -5,10 +5,21 @@ import { NotificationSystem, initNotificationToggle } from '../notifications.js'
 import { initDashboard } from './core.js';
 import { initScrollOrb } from '../scroll-orb.js';
 
+async function loadChartJs() {
+  try {
+    return await import('chart.js/auto');
+  } catch (err) {
+    console.warn('Failed to load local Chart.js, falling back to CDN:', err);
+    return await import(
+      'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.esm.js'
+    );
+  }
+}
+
 async function setupChart() {
   const ctx = document.getElementById('networkChart');
   if (!ctx) return null;
-  const { default: Chart } = await import('chart.js/auto');
+  const { default: Chart } = await loadChartJs();
   return new Chart(ctx, {
     type: 'doughnut',
     data: {
