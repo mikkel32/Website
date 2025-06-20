@@ -12,6 +12,7 @@ import {
 import { initHeroAnimations } from './hero-animations.js';
 import { initScrollOrb } from './scroll-orb.js';
 import { initParallax } from './parallax.js';
+import { initPreloader } from './preloader.js';
 
 export function setupLinkTransitions() {
   const reset = () => document.body.classList.remove('page-exit');
@@ -93,6 +94,7 @@ if (window.location.protocol === 'file:') {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  await initPreloader();
   initTheme();
   const navMenu = initNavigation();
   await initHeroAnimations();
@@ -179,12 +181,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  const preloader = document.getElementById('preloader');
-  if (preloader) {
-    preloader.classList.add('fade-out');
-    preloader.addEventListener('transitionend', () => preloader.remove());
-    document.body.classList.remove('no-scroll');
-  }
 
   const notifications = new NotificationSystem();
   initNotificationToggle(notifications);

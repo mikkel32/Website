@@ -800,6 +800,7 @@ body.dark-mode .scroll-orb {
   height: 100%;
   background: var(--bg-color);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 9999;
@@ -812,19 +813,42 @@ body.dark-mode .scroll-orb {
   pointer-events: none;
 }
 
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgb(0 0 0 / 10%);
-  border-top-color: var(--accent-color);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.preloader-shield {
+  width: 64px;
+  height: 64px;
+  fill: var(--primary-color);
+  filter: drop-shadow(var(--shadow-glow));
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.preloader-progress {
+  width: 80%;
+  max-width: 300px;
+  height: 8px;
+  margin-top: 1.5rem;
+  border-radius: var(--radius-md);
+  background: var(--border-light);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.preloader-progress .progress-bar {
+  width: 0;
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+
+body.dark-mode #preloader .preloader-shield {
+  fill: var(--primary-light);
+}
+
+body.dark-mode #preloader .preloader-progress {
+  background: var(--border-color);
+}
+
+body.dark-mode #preloader .progress-bar {
+  background: var(--accent-color);
 }
 
 /* Scroll to Top Button */
