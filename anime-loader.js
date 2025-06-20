@@ -30,11 +30,46 @@ async function loadFromCDN() {
   }
 }
 
+let importMapCache;
+
+async function importWithMap(spec) {
+  try {
+    return await import(spec);
+  } catch (err) {
+    if (typeof document !== 'undefined') {
+      if (!importMapCache) {
+        const mapEl = document.querySelector('script[type="importmap"]');
+        if (mapEl) {
+          try {
+            if (mapEl.src) {
+              const res = await fetch(mapEl.src);
+              importMapCache = await res.json();
+            } else {
+              importMapCache = JSON.parse(mapEl.textContent || '{}');
+            }
+          } catch {
+            importMapCache = {};
+          }
+        } else {
+          importMapCache = {};
+        }
+      }
+      const resolved = importMapCache.imports && importMapCache.imports[spec];
+      if (resolved) {
+        try {
+          return await import(resolved);
+        } catch {}
+      }
+    }
+    throw err;
+  }
+}
+
 export async function getAnime() {
   if (animeModule !== undefined) return animeModule;
 
   try {
-    animeModule = await import('animejs');
+    animeModule = await importWithMap('animejs');
   } catch (err) {
     console.warn('Local Anime.js not found, trying bundled copy...', err);
     try {
