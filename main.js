@@ -273,8 +273,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupLinkTransitions();
 });
 
+function parseRetryAfter(value) {
+  if (!value) return 0;
+  const secs = parseInt(value, 10);
+  if (!Number.isNaN(secs)) return secs * 1000;
+  const date = Date.parse(value);
+  if (!Number.isNaN(date)) return Math.max(date - Date.now(), 0);
+  return 0;
+}
+
+async function registerServiceWorkerWithRetry(url = '/service-worker.js', attempts = 3) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(url, { headers: { 'Service-Worker': 'script' } });
+      if (res.status === 429) {
+        const delay = parseRetryAfter(res.headers.get('Retry-After')) || 1000;
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
+      if (!res.ok) {
+        // eslint-disable-next-line no-console
+        console.error(`Service worker script error: ${res.status}`);
+        return;
+      }
+      await navigator.serviceWorker.register(url);
+      return;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Service worker registration failed:', err);
+      return;
+    }
+  }
+  // eslint-disable-next-line no-console
+  console.error('Service worker registration aborted after retries');
+}
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js');
+    registerServiceWorkerWithRetry();
   });
 }
