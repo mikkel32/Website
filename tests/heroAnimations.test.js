@@ -25,13 +25,13 @@ describe('typeSubtitle', () => {
 describe('initHeroAnimations', () => {
   test('creates cinematic timeline', async () => {
     jest.resetModules();
-    const timeline = jest.fn(() => ({ add: jest.fn().mockReturnThis(), finished: Promise.resolve() }));
+    const createTimeline = jest.fn(() => ({ add: jest.fn().mockReturnThis(), finished: Promise.resolve() }));
     const animate = jest.fn(() => ({ finished: Promise.resolve() }));
     const stagger = jest.fn(() => jest.fn());
     jest.unstable_mockModule('animejs', () => ({
       animate,
       stagger,
-      timeline,
+      createTimeline,
     }));
     global.fetch = jest.fn().mockResolvedValue({ ok: true });
     const { initHeroAnimations } = await import('../hero-animations.js');
@@ -42,6 +42,6 @@ describe('initHeroAnimations', () => {
       <p class="hero-subtitle">Test</p>`;
     window.matchMedia = jest.fn().mockReturnValue({ matches: false });
     await initHeroAnimations();
-    expect(timeline).toHaveBeenCalledTimes(2);
+    expect(createTimeline).toHaveBeenCalledTimes(2);
   });
 });

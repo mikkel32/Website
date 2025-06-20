@@ -1,6 +1,6 @@
 {
   "imports": {
-    "animejs": "./node_modules/animejs/lib/anime.esm.js",
+    "animejs": "./anime.bundle.mjs",
     "dompurify": "./node_modules/dompurify/dist/purify.es.mjs",
     "chart.js/auto": "./node_modules/chart.js/auto/auto.js"
   }
