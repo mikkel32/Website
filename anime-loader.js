@@ -36,8 +36,13 @@ export async function getAnime() {
   try {
     animeModule = await import('animejs');
   } catch (err) {
-    console.warn('Local Anime.js not found, falling back to CDN...', err);
-    animeModule = await loadFromCDN();
+    console.warn('Local Anime.js not found, trying bundled copy...', err);
+    try {
+      animeModule = await import('./anime.bundle.mjs');
+    } catch (bundleErr) {
+      console.warn('Bundled Anime.js failed, falling back to CDN...', bundleErr);
+      animeModule = await loadFromCDN();
+    }
   }
 
   return animeModule;
