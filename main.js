@@ -1,4 +1,6 @@
-import './error-capture.js';
+if (typeof process === 'undefined' || process.env?.NODE_ENV !== 'production') {
+  import('./error-capture.js');
+}
 import { initTheme, initNavigation } from './theme.js';
 import { initSearch } from './search.js';
 import { NotificationSystem, initNotificationToggle } from './notifications.js';
