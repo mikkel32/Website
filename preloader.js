@@ -15,6 +15,7 @@ class Preloader {
     this.observer = null;
     this.timeoutId = null;
     this.preloadMap = new Map();
+    this.prefetched = new Set();
     this.noop = () => {};
     this.animate = this.noop;
     this.createTimeline = () => ({ add: () => {}, finished: Promise.resolve() });
@@ -31,10 +32,24 @@ class Preloader {
   }
 
   preloadResource(href) {
-    if (!href || this.preloadMap.has(href)) return;
-    const p = fetch(href, { cache: 'force-cache', mode: 'no-cors', credentials: 'same-origin' }).catch(() => {});
+    if (!href || this.preloadMap.has(href) || typeof fetch !== 'function') return;
+    const p = fetch(href, {
+      cache: 'force-cache',
+      mode: 'no-cors',
+      credentials: 'same-origin',
+    }).catch(() => {});
     this.preloadMap.set(href, p);
     this.trackPromise(p);
+  }
+
+  prefetchLazyImages() {
+    document.querySelectorAll('img.lazy-image[data-src]').forEach((img) => {
+      const src = img.dataset.src;
+      if (src && !this.prefetched.has(src)) {
+        this.prefetched.add(src);
+        this.preloadResource(src);
+      }
+    });
   }
 
   trackElement(el, alreadyLoaded = false) {
@@ -118,6 +133,9 @@ class Preloader {
           this.trackElement(el, el.readyState === 'complete' || el.readyState === 'loaded');
         }
       }
+      if (el.dataset && el.dataset.src && el.classList.contains('lazy-image')) {
+        this.preloadResource(el.dataset.src);
+      }
       if (el.hasAttribute && el.hasAttribute('href')) {
         if (el.tagName === 'LINK' && el.rel === 'preload') {
           const as = el.getAttribute('as');
@@ -147,13 +165,15 @@ class Preloader {
     this.observer.observe(document.documentElement, {
       attributes: true,
       subtree: true,
-      attributeFilter: ['src', 'href'],
+      attributeFilter: ['src', 'href', 'data-src'],
       childList: true,
     });
   }
 
   trackInitialAssets() {
     this.preloadFonts().forEach((p) => this.trackPromise(p));
+
+    this.prefetchLazyImages();
 
     const images = Array.from(document.images).filter((img) => !this.isPlaceholder(img));
     images.forEach((img) => this.trackElement(img, img.complete));
