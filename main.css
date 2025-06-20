@@ -1351,6 +1351,14 @@ body.dark-mode .search-box {
   .preloader-shield {
     animation: none !important;
   }
+  .preloader-progress .progress-bar {
+    transition: none !important;
+  }
+  #preloader,
+  #preloader.fade-out {
+    animation: none !important;
+    transition: none !important;
+  }
   .hero-cinematic {
     perspective: none !important;
     backface-visibility: visible !important;
@@ -1392,5 +1400,4 @@ body.dark-mode .search-box {
     color: #000;
   }
 }
-
 /*# sourceMappingURL=main.css.map */

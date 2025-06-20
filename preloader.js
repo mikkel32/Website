@@ -1,8 +1,6 @@
 import { getAnime } from './anime-loader.js';
 
 export async function initPreloader() {
-  let animate;
-  let createTimeline;
   const preloader = document.getElementById('preloader');
   if (!preloader) return Promise.resolve();
 
@@ -10,23 +8,22 @@ export async function initPreloader() {
   const progressBar = preloader.querySelector('.progress-bar');
   const progressText = preloader.querySelector('.progress-text');
 
-  document.body.setAttribute('aria-busy', 'true');
-  progressBar.setAttribute('aria-valuenow', '0');
-  if (progressText) progressText.textContent = '0%';
-
-  const mod = await getAnime();
-  animate = mod?.animate || mod?.default || (() => {});
-  createTimeline = mod?.createTimeline || mod?.timeline || (() => ({ add: () => {}, finished: Promise.resolve() }));
-
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (reduceMotion) {
-    animate(shield, {
-      opacity: [0, 1],
-      duration: 300,
-      easing: 'easeOutCubic',
-    });
-  } else {
+  let animate = () => {};
+  let createTimeline = () => ({ add: () => {}, finished: Promise.resolve() });
+
+  if (!reduceMotion) {
+    const mod = await getAnime();
+    animate = mod?.animate || mod?.default || (() => {});
+    createTimeline = mod?.createTimeline || mod?.timeline || (() => ({ add: () => {}, finished: Promise.resolve() }));
+  }
+
+  document.body.setAttribute('aria-busy', 'true');
+  progressBar.setAttribute('aria-valuenow', reduceMotion ? '100' : '0');
+  if (progressText) progressText.textContent = reduceMotion ? '100%' : '0%';
+
+  if (!reduceMotion) {
     const introTl = createTimeline({ easing: 'easeOutCubic', duration: 400 });
     introTl.add({
       targets: shield,
@@ -41,6 +38,12 @@ export async function initPreloader() {
       direction: 'alternate',
       loop: true,
     });
+  } else {
+    shield.style.opacity = '1';
+    shield.style.transform = 'none';
+    progressBar.style.width = '100%';
+    progressBar.setAttribute('aria-valuenow', '100');
+    if (progressText) progressText.textContent = '100%';
   }
 
   const duration = 3000;
@@ -75,6 +78,12 @@ export async function initPreloader() {
 
   const timer = setInterval(() => {
     const elapsed = Date.now() - start;
+    if (reduceMotion) {
+      if (loaded === total || elapsed >= duration) {
+        finish();
+      }
+      return;
+    }
     let progress = Math.min(100, (elapsed / duration) * 100);
     if (loaded === total) {
       progress = 100;
@@ -91,7 +100,7 @@ export async function initPreloader() {
     if (!img.complete) {
       const handler = () => {
         loaded += 1;
-        if (loaded === total) {
+        if (loaded === total && !reduceMotion) {
           progressBar.style.width = '100%';
           progressBar.setAttribute('aria-valuenow', '100');
           if (progressText) progressText.textContent = '100%';
