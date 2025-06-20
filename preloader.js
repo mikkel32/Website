@@ -59,6 +59,14 @@ class Preloader {
     });
   }
 
+  prefetchPages() {
+    document.querySelectorAll('a[data-prefetch]').forEach((a) => {
+      if (a.href) {
+        this.preloadResource(a.href);
+      }
+    });
+  }
+
   trackElement(el, alreadyLoaded = false) {
     if (this.assets.has(el)) return;
     this.assets.add(el);
@@ -143,6 +151,9 @@ class Preloader {
       if (el.dataset && el.dataset.src && el.classList.contains('lazy-image')) {
         this.preloadResource(el.dataset.src);
       }
+      if (el.dataset && 'prefetch' in el.dataset && el.tagName === 'A' && el.href) {
+        this.preloadResource(el.href);
+      }
       if (el.hasAttribute && el.hasAttribute('href')) {
         if (el.tagName === 'LINK' && el.rel === 'preload') {
           const as = el.getAttribute('as');
@@ -185,6 +196,7 @@ class Preloader {
     this.preloadFonts().forEach((p) => this.trackPromise(p));
 
     this.prefetchLazyImages();
+    this.prefetchPages();
 
     const images = Array.from(document.images).filter((img) => !this.isPlaceholder(img));
     images.forEach((img) => this.trackElement(img, img.complete));
