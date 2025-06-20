@@ -85,4 +85,45 @@ describe('initPreloader', () => {
     jest.advanceTimersByTime(100);
     expect(animate).not.toHaveBeenCalled();
   });
+
+  test('handles lazy loaded images', async () => {
+    jest.resetModules();
+    const animate = jest.fn(() => ({ finished: Promise.resolve() }));
+    const createTimeline = jest.fn(() => ({ add: jest.fn(), finished: Promise.resolve() }));
+    jest.unstable_mockModule('../anime-loader.js', () => ({ getAnime: () => Promise.resolve({ animate, createTimeline }) }));
+    const { initPreloader } = await import('../preloader.js');
+    window.matchMedia = jest.fn().mockReturnValue({ matches: false });
+
+    document.body.innerHTML = `
+      <div id="preloader" aria-hidden="true">
+        <svg class="preloader-shield"></svg>
+        <div class="preloader-progress">
+          <div class="progress-bar"></div>
+          <span class="progress-text" aria-live="polite"></span>
+        </div>
+      </div>`;
+
+    const lazy = document.createElement('img');
+    lazy.className = 'lazy-image';
+    lazy.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+    lazy.setAttribute('data-src', 'foo.jpg');
+    document.body.appendChild(lazy);
+
+    jest.useFakeTimers();
+    const preloaderPromise = initPreloader();
+    await Promise.resolve();
+
+    jest.advanceTimersByTime(3000);
+    expect(document.getElementById('preloader')).not.toBeNull();
+
+    lazy.src = 'foo.jpg';
+    lazy.dispatchEvent(new Event('load'));
+    jest.advanceTimersByTime(100);
+    const preloader = document.getElementById('preloader');
+    preloader.dispatchEvent(new Event('transitionend'));
+    await preloaderPromise;
+
+    expect(document.getElementById('preloader')).toBeNull();
+    jest.useRealTimers();
+  });
 });
