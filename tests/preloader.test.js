@@ -12,7 +12,10 @@ describe('initPreloader', () => {
     document.body.innerHTML = `
       <div id="preloader" aria-hidden="true">
         <svg class="preloader-shield"></svg>
-        <div class="preloader-progress"><div class="progress-bar"></div></div>
+        <div class="preloader-progress">
+          <div class="progress-bar"></div>
+          <span class="progress-text" aria-live="polite"></span>
+        </div>
       </div>`;
 
     const img1 = document.createElement('img');
@@ -29,12 +32,22 @@ describe('initPreloader', () => {
     jest.useFakeTimers();
     initPreloader();
     await Promise.resolve();
-    jest.advanceTimersByTime(3000);
+    const progressBar = document.querySelector('.progress-bar');
+    const progressText = document.querySelector('.progress-text');
+
+    jest.advanceTimersByTime(1500);
+    expect(progressText.textContent).toBe(
+      `${progressBar.getAttribute('aria-valuenow')}%`,
+    );
+
+    jest.advanceTimersByTime(1500);
 
     expect(addSpy1).toHaveBeenCalledWith('load', expect.any(Function));
     expect(addSpy2).toHaveBeenCalledWith('load', expect.any(Function));
     expect(removeSpy1).toHaveBeenCalledTimes(2);
     expect(removeSpy2).toHaveBeenCalledTimes(2);
+
+    expect(progressText.textContent).toBe('100%');
 
     expect(animate).toHaveBeenCalled();
     const opts = animate.mock.calls[0][1];

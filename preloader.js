@@ -8,9 +8,11 @@ export async function initPreloader() {
 
   const shield = preloader.querySelector('.preloader-shield');
   const progressBar = preloader.querySelector('.progress-bar');
+  const progressText = preloader.querySelector('.progress-text');
 
   document.body.setAttribute('aria-busy', 'true');
   progressBar.setAttribute('aria-valuenow', '0');
+  if (progressText) progressText.textContent = '0%';
 
   const mod = await getAnime();
   animate = mod?.animate || mod?.default || (() => {});
@@ -53,6 +55,7 @@ export async function initPreloader() {
       clearInterval(timer);
       progressBar.style.width = '100%';
       progressBar.removeAttribute('aria-valuenow');
+      if (progressText) progressText.textContent = '100%';
       document.body.removeAttribute('aria-busy');
       tracked.forEach(({ img, handler }) => {
         img.removeEventListener('load', handler);
@@ -78,6 +81,7 @@ export async function initPreloader() {
     }
     progressBar.style.width = `${progress}%`;
     progressBar.setAttribute('aria-valuenow', String(Math.round(progress)));
+    if (progressText) progressText.textContent = `${Math.round(progress)}%`;
     if (progress >= 100) {
       finish();
     }
@@ -90,6 +94,7 @@ export async function initPreloader() {
         if (loaded === total) {
           progressBar.style.width = '100%';
           progressBar.setAttribute('aria-valuenow', '100');
+          if (progressText) progressText.textContent = '100%';
         }
       };
       tracked.push({ img, handler });
