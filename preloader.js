@@ -31,8 +31,10 @@ class Preloader {
   }
 
   preloadResource(href) {
-    if (!href || this.preloadMap.has(href)) return;
-    const p = fetch(href).catch(() => {});
+    if (!href || this.preloadMap.has(href) || typeof fetch !== 'function') return;
+    const p = fetch(href, { cache: 'force-cache', credentials: 'same-origin' }).catch(
+      () => {}
+    );
     this.preloadMap.set(href, p);
     this.trackPromise(p);
   }
@@ -158,12 +160,21 @@ class Preloader {
     const images = Array.from(document.images).filter((img) => !this.isPlaceholder(img));
     images.forEach((img) => this.trackElement(img, img.complete));
 
+    const lazyImages = Array.from(
+      document.querySelectorAll('img[data-src]')
+    ).map((img) => img.dataset.src);
+    lazyImages.forEach((src) => this.preloadResource(src));
+
     Array.from(document.querySelectorAll('script[src]')).forEach((s) => {
       this.trackElement(s, s.readyState === 'complete' || s.readyState === 'loaded');
     });
 
     Array.from(document.querySelectorAll('link[rel="stylesheet"]')).forEach((l) => {
       this.trackElement(l, l.sheet !== null);
+    });
+
+    Array.from(document.querySelectorAll('video[src],audio[src]')).forEach((m) => {
+      this.trackElement(m, m.readyState >= 3);
     });
 
     if (document.fonts) {
@@ -199,9 +210,8 @@ class Preloader {
       const as = link.getAttribute('as');
       if (as === 'font') {
         this.trackElement(link);
-      } else {
-        this.preloadResource(href);
       }
+      this.preloadResource(href);
     });
 
     if (this.assets.size === 0) {
