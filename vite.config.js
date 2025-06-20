@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
-import path from 'path';
+// This project previously aliased '@' to 'src' but no files
+// use that path prefix, so the alias block was removed.
 
 export default defineConfig({
   css: {
@@ -13,9 +14,4 @@ export default defineConfig({
     outDir: 'dist',
   },
   base: './',
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
 });
