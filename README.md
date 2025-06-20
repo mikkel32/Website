@@ -67,7 +67,7 @@ retaining `default-src 'self'` for all other resources.
 address. When a client exceeds the allowed number of requests within the
 configured time window, the server responds with **HTTP 429 Too Many Requests**.
 
-The defaults allow **20** requests every **1** second. You can adjust these
+The defaults allow **60** requests every **1** second. You can adjust these
 limits by setting the environment variables `MAX_REQUESTS` and `RATE_WINDOW`:
 
 ```bash
@@ -77,6 +77,11 @@ MAX_REQUESTS=10 RATE_WINDOW=2 python security.py
 The example above permits ten requests from the same IP within a two second
 window before subsequent requests are rejected. The `Retry-After` header of the
 response indicates how long clients should wait before retrying.
+
+Setting `MAX_REQUESTS` or `RATE_WINDOW` too low can prevent fonts, JavaScript
+modules, and other assets from loading during the initial page visit. If you see
+missing icons or scripts failing with **HTTP 429** responses, increase these
+values until the site loads consistently.
 
 The default Content Security Policy now includes `img-src 'self' data: https://images.unsplash.com` so that
 local images, data URIs, and the Unsplash images used in the demo load without triggering browser CSP errors.
