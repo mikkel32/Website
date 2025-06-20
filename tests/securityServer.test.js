@@ -8,7 +8,7 @@ jest.setTimeout(20000);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-function startServer(port) {
+function startServer(port, extraEnv = {}) {
   return new Promise((resolve, reject) => {
     const proc = spawn('python3', [join(__dirname, '..', 'security.py')], {
       env: {
@@ -17,6 +17,7 @@ function startServer(port) {
         PORT: String(port),
         MAX_REQUESTS: '3',
         RATE_WINDOW: '1',
+        ...extraEnv,
       },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -37,6 +38,21 @@ function startServer(port) {
       req.end();
     };
     tryConnect();
+  });
+}
+
+function startServerExpectExit(port) {
+  return new Promise((resolve) => {
+    const proc = spawn('python3', [join(__dirname, '..', 'security.py')], {
+      env: {
+        ...process.env,
+        NO_BROWSER: '1',
+        PORT: String(port),
+        FORCE_SCSS_FAIL: '1',
+      },
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    proc.on('exit', (code) => resolve(code));
   });
 }
 
@@ -71,5 +87,10 @@ describe('security.py server', () => {
       codes.push(res.statusCode);
     }
     expect(codes).toContain(429);
+  });
+
+  test('exits when CSS compilation fails', async () => {
+    const exitCode = await startServerExpectExit(port + 1);
+    expect(exitCode).not.toBe(0);
   });
 });
