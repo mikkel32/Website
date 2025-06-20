@@ -3,8 +3,15 @@ export async function initPreloader() {
   if (typeof process !== 'undefined' && process.env.JEST_WORKER_ID) {
     anime = () => {};
   } else {
-    const mod = await import('animejs');
-    anime = mod.default;
+    try {
+      const mod = await import('animejs');
+      anime = mod.default;
+    } catch {
+      const fallback = await import(
+        'https://cdn.jsdelivr.net/npm/animejs@4.0.2/lib/anime.esm.js'
+      );
+      anime = fallback.default;
+    }
   }
   const preloader = document.getElementById('preloader');
   if (!preloader) return Promise.resolve();
