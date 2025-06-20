@@ -2,23 +2,6 @@
 // when served by a simple HTTP server without a bundler.
 let animeModule;
 
-export function typeSubtitle(element, text, interval = 50) {
-  return new Promise((resolve) => {
-    let i = 0;
-    element.textContent = '';
-    element.classList.add('typing');
-    const id = setInterval(() => {
-      element.textContent += text[i];
-      i += 1;
-      if (i >= text.length) {
-        clearInterval(id);
-        element.classList.remove('typing');
-        resolve();
-      }
-    }, interval);
-  });
-}
-
 const CDN_URL =
   'https://cdn.jsdelivr.net/npm/animejs@4.0.2/lib/anime.esm.min.js';
 // sha256 hash of the file at CDN_URL (hex encoded)
@@ -76,12 +59,6 @@ export async function initHeroAnimations() {
 
   const { animate, stagger, timeline } = animeModule;
 
-  const subtitleEl = document.querySelector('.hero-subtitle');
-  const subtitleText = subtitleEl?.textContent || '';
-  if (subtitleEl) {
-    subtitleEl.textContent = '';
-  }
-
   const tl = timeline({ easing: 'easeOutCubic', duration: 700 });
 
   tl.add({
@@ -130,9 +107,4 @@ export async function initHeroAnimations() {
     delay: stagger(200, { start: 1200 }),
     duration: 6000,
   });
-
-  if (subtitleEl) {
-    await tl.finished;
-    await typeSubtitle(subtitleEl, subtitleText, 75);
-  }
 }
