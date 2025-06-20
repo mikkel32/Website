@@ -4,7 +4,8 @@ describe('initPreloader', () => {
   test('invokes anime with pulse effect and updates on asset events', async () => {
     jest.resetModules();
     const animate = jest.fn(() => ({ finished: Promise.resolve() }));
-    const createTimeline = jest.fn(() => ({ add: jest.fn(), finished: Promise.resolve() }));
+    const timeline = { add: jest.fn(), finished: Promise.resolve() };
+    const createTimeline = jest.fn(() => timeline);
     jest.unstable_mockModule('../anime-loader.js', () => ({ getAnime: () => Promise.resolve({ animate, createTimeline }) }));
     const { initPreloader } = await import('../preloader.js');
     window.matchMedia = jest.fn().mockReturnValue({ matches: false });
@@ -54,16 +55,26 @@ describe('initPreloader', () => {
 
     expect(progressText.textContent).toBe('100%');
 
+    expect(createTimeline).toHaveBeenCalledWith({ easing: 'easeOutCubic', duration: 600 });
+    expect(timeline.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        targets: expect.anything(),
+        rotate: [0, 360],
+        scale: [0.5, 1],
+        opacity: [0, 1],
+      }),
+    );
+
     expect(animate).toHaveBeenCalled();
     const opts = animate.mock.calls[0][1];
-    expect(opts.rotate).toBeUndefined();
     expect(opts.scale).toEqual([1, 1.1]);
   });
 
   test('skips animations when prefers-reduced-motion', async () => {
     jest.resetModules();
     const animate = jest.fn(() => ({ finished: Promise.resolve() }));
-    const createTimeline = jest.fn(() => ({ add: jest.fn(), finished: Promise.resolve() }));
+    const timeline = { add: jest.fn(), finished: Promise.resolve() };
+    const createTimeline = jest.fn(() => timeline);
     jest.unstable_mockModule('../anime-loader.js', () => ({ getAnime: () => Promise.resolve({ animate, createTimeline }) }));
     const { initPreloader } = await import('../preloader.js');
     window.matchMedia = jest.fn().mockReturnValue({ matches: true });
@@ -97,13 +108,21 @@ describe('initPreloader', () => {
     await preloaderPromise;
 
     expect(progressText.textContent).toBe('100%');
+    expect(createTimeline).toHaveBeenCalledWith({ easing: 'linear', duration: 400 });
+    expect(timeline.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        targets: expect.anything(),
+        opacity: [0, 1],
+      }),
+    );
     expect(animate).not.toHaveBeenCalled();
   });
 
   test('handles lazy loaded images and timeout', async () => {
     jest.resetModules();
     const animate = jest.fn(() => ({ finished: Promise.resolve() }));
-    const createTimeline = jest.fn(() => ({ add: jest.fn(), finished: Promise.resolve() }));
+    const timeline = { add: jest.fn(), finished: Promise.resolve() };
+    const createTimeline = jest.fn(() => timeline);
     jest.unstable_mockModule('../anime-loader.js', () => ({ getAnime: () => Promise.resolve({ animate, createTimeline }) }));
     const { initPreloader } = await import('../preloader.js');
     window.matchMedia = jest.fn().mockReturnValue({ matches: false });
@@ -137,5 +156,6 @@ describe('initPreloader', () => {
 
     expect(document.getElementById('preloader')).toBeNull();
     jest.useRealTimers();
+    expect(createTimeline).toHaveBeenCalled();
   });
 });

@@ -757,6 +757,16 @@ body.dark-mode .scroll-orb {
   }
 }
 
+@keyframes spin-scale {
+  from {
+    transform: rotate(0deg) scale(0.5);
+  }
+
+  to {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
 @keyframes fade-out {
   from {
     opacity: 1;

@@ -25,23 +25,31 @@ export async function initPreloader(options = {}) {
   if (progressText) progressText.textContent = '0%';
 
   if (!reduceMotion) {
-    const introTl = createTimeline({ easing: 'easeOutCubic', duration: 400 });
+    shield.style.opacity = '0';
+    const introTl = createTimeline({ easing: 'easeOutCubic', duration: 600 });
     introTl.add({
       targets: shield,
-      translateY: [20, 0],
+      rotate: [0, 360],
       scale: [0.5, 1],
       opacity: [0, 1],
+      filter: ['drop-shadow(0 0 0 rgba(0,0,0,0))', 'drop-shadow(var(--shadow-glow))'],
     });
-    animate(shield, {
-      scale: [1, 1.1],
-      duration: 800,
-      easing: 'easeInOutSine',
-      direction: 'alternate',
-      loop: true,
+    introTl.finished.then(() => {
+      animate(shield, {
+        scale: [1, 1.1],
+        duration: 800,
+        easing: 'easeInOutSine',
+        direction: 'alternate',
+        loop: true,
+      });
     });
   } else {
-    shield.style.opacity = '1';
-    shield.style.transform = 'none';
+    shield.style.opacity = '0';
+    const introTl = createTimeline({ easing: 'linear', duration: 400 });
+    introTl.add({
+      targets: shield,
+      opacity: [0, 1],
+    });
     progressBar.style.transition = 'none';
   }
 
