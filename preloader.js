@@ -13,18 +13,23 @@ export async function initPreloader(options = {}) {
 
   let animate = () => {};
   let createTimeline = () => ({ add: () => {}, finished: Promise.resolve() });
+  let animeLoaded = false;
 
   if (!reduceMotion) {
     const mod = await getAnime();
-    animate = mod?.animate || mod?.default || (() => {});
-    createTimeline = mod?.createTimeline || mod?.timeline || (() => ({ add: () => {}, finished: Promise.resolve() }));
+    if (mod) {
+      animeLoaded = true;
+      animate = mod.animate || mod.default || (() => {});
+      createTimeline =
+        mod.createTimeline || mod.timeline || (() => ({ add: () => {}, finished: Promise.resolve() }));
+    }
   }
 
   document.body.setAttribute('aria-busy', 'true');
   progressBar.setAttribute('aria-valuenow', '0');
   if (progressText) progressText.textContent = '0%';
 
-  if (!reduceMotion) {
+  if (!reduceMotion && animeLoaded) {
     shield.style.opacity = '0';
     const introTl = createTimeline({ easing: 'easeOutCubic', duration: 600 });
     introTl.add({
@@ -34,7 +39,7 @@ export async function initPreloader(options = {}) {
       opacity: [0, 1],
       filter: ['drop-shadow(0 0 0 rgba(0,0,0,0))', 'drop-shadow(var(--shadow-glow))'],
     });
-    introTl.finished.then(() => {
+    Promise.resolve(introTl.finished).then(() => {
       animate(shield, {
         scale: [1, 1.1],
         duration: 800,

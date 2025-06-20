@@ -22,19 +22,13 @@ export async function initHeroAnimations() {
     await loadAnime();
   }
 
-  if (!animeModule) {
-    return;
-  }
-
-  const { animate, stagger, createTimeline } = animeModule;
-
   const subtitleEl = document.querySelector('.hero-subtitle');
   const subtitleText = subtitleEl?.textContent || '';
   if (subtitleEl) {
     subtitleEl.textContent = '';
   }
 
-  if (reduceMotion) {
+  if (reduceMotion || !animeModule) {
     document
       .querySelectorAll(
         '.hero-cinematic, .hero-title, .hero-buttons .btn, .shield-animation'
@@ -53,6 +47,8 @@ export async function initHeroAnimations() {
     }
     return;
   }
+
+  const { animate, stagger, createTimeline } = animeModule;
 
   const introTl = createTimeline({ easing: 'easeOutExpo', duration: 800 });
 
