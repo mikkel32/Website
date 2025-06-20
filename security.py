@@ -258,8 +258,11 @@ def _run_postcss(css: Path) -> bool:
         return False
 
 
-def compile_scss() -> None:
+def compile_scss() -> bool:
     """Compile SCSS sources to CSS using either Node or the Python sass lib."""
+    if os.environ.get("FORCE_SCSS_FAIL") == "1":
+        print("Forced SCSS compilation failure for testing")
+        return False
     scss = ROOT_DIR / "src" / "styles" / "main.scss"
     css = ROOT_DIR / "main.css"
     dash_scss = ROOT_DIR / "src" / "styles" / "dashboard.scss"
@@ -278,7 +281,7 @@ def compile_scss() -> None:
             )
             _run_postcss(css)
             _run_postcss(dash_css)
-            return
+            return True
         except subprocess.CalledProcessError as exc:
             print("Failed to compile SCSS with npx:", exc)
     else:
@@ -297,7 +300,7 @@ def compile_scss() -> None:
             dash_css.write_text(pysass.compile(filename=dash_scss.as_posix()))
             _run_postcss(css)
             _run_postcss(dash_css)
-            return
+            return True
         except Exception as exc:  # pylint: disable=broad-except
             print("Failed to compile SCSS with python sass:", exc)
 
@@ -307,6 +310,8 @@ def compile_scss() -> None:
             '"sass" Python package is unavailable. Install Node.js from '
             'https://nodejs.org/ or manually install a prebuilt "sass" wheel.'
         )
+
+    return False
 
 
 def _find_free_port(start: int = 8000) -> int:
@@ -321,7 +326,9 @@ def _find_free_port(start: int = 8000) -> int:
 
 def main() -> None:
     _ensure_node_deps()
-    compile_scss()
+    if not compile_scss():
+        print("Error: failed to compile SCSS. Aborting server startup.")
+        sys.exit(1)
     limit = int(os.environ.get("MAX_REQUESTS", "20"))
     window = int(os.environ.get("RATE_WINDOW", "1"))
     SecureHandler.rate_limiter = RateLimiter(limit, window)
