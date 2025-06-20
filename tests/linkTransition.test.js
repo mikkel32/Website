@@ -1,4 +1,3 @@
-import { jest } from '@jest/globals';
 import { setupLinkTransitions } from '../main.js';
 
 describe('link transitions', () => {

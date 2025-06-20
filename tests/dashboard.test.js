@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+/* eslint-disable no-console */
 
 describe('initDashboard', () => {
   test('captures console errors', async () => {
