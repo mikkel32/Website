@@ -2,12 +2,7 @@ import { getAnime } from './anime-loader.js';
 
 export async function initPreloader() {
   let animate;
-  if (typeof process !== 'undefined' && process.env.JEST_WORKER_ID) {
-    animate = () => {};
-  } else {
-    const mod = await getAnime();
-    animate = mod?.animate || mod?.default || (() => {});
-  }
+  let createTimeline;
   const preloader = document.getElementById('preloader');
   if (!preloader) return Promise.resolve();
 
@@ -17,12 +12,34 @@ export async function initPreloader() {
   document.body.setAttribute('aria-busy', 'true');
   progressBar.setAttribute('aria-valuenow', '0');
 
-  animate(shield, {
-    rotate: '360deg',
-    duration: 1000,
-    easing: 'linear',
-    loop: true,
-  });
+  const mod = await getAnime();
+  animate = mod?.animate || mod?.default || (() => {});
+  createTimeline = mod?.createTimeline || mod?.timeline || (() => ({ add: () => {}, finished: Promise.resolve() }));
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduceMotion) {
+    animate(shield, {
+      opacity: [0, 1],
+      duration: 300,
+      easing: 'easeOutCubic',
+    });
+  } else {
+    const introTl = createTimeline({ easing: 'easeOutCubic', duration: 400 });
+    introTl.add({
+      targets: shield,
+      translateY: [20, 0],
+      scale: [0.5, 1],
+      opacity: [0, 1],
+    });
+    animate(shield, {
+      scale: [1, 1.1],
+      duration: 800,
+      easing: 'easeInOutSine',
+      direction: 'alternate',
+      loop: true,
+    });
+  }
 
   const duration = 3000;
   const start = Date.now();

@@ -120,6 +120,13 @@ npm run dev
   disables itself when `prefers-reduced-motion` is enabled
 - `tests/` – Jest unit tests for utilities and security features
 
+## Loading Animation
+
+The page shows a shield icon while assets load. A short Anime.js timeline slides
+the shield upward from `scale: 0.5` to full size while fading in. During loading
+the icon gently pulses between `scale(1)` and `scale(1.1)`. If `prefers-reduced-
+motion` is enabled the pulse is skipped so the shield simply fades in and out.
+
 ## Diagnostics dashboard
 
 The optional `dashboard.html` page visualizes logs captured by
