@@ -28,7 +28,7 @@ export async function initHeroAnimations() {
     return;
   }
 
-  const { animate, stagger, timeline } = animeModule;
+  const { animate, stagger, createTimeline } = animeModule;
 
   const subtitleEl = document.querySelector('.hero-subtitle');
   const subtitleText = subtitleEl?.textContent || '';
@@ -36,7 +36,7 @@ export async function initHeroAnimations() {
     subtitleEl.textContent = '';
   }
 
-  const cinematicTl = timeline({ easing: 'easeOutCubic', duration: 800 });
+  const cinematicTl = createTimeline({ easing: 'easeOutCubic', duration: 800 });
 
   cinematicTl
     .add({
@@ -64,7 +64,7 @@ export async function initHeroAnimations() {
 
   await cinematicTl.finished;
 
-  const tl = timeline({ easing: 'easeOutCubic', duration: 700 });
+  const tl = createTimeline({ easing: 'easeOutCubic', duration: 700 });
 
   tl.add({
     targets: '.hero-title',
