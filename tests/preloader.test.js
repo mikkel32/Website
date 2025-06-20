@@ -324,8 +324,14 @@ describe('initPreloader', () => {
     const preloadPromise = initPreloader({ timeout: 1000 });
     await Promise.resolve();
 
-    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('foo.css'));
-    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('bar.js'));
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining('foo.css'),
+      expect.any(Object)
+    );
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining('bar.js'),
+      expect.any(Object)
+    );
 
     jest.runAllTimers();
     const preloader = document.getElementById('preloader');
