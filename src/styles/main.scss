@@ -14,11 +14,19 @@ body {
   color: var(--text-color);
   line-height: 1.6;
   opacity: 1;
-  transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+  transition: background 0.6s ease, color 0.3s ease, opacity 0.3s ease;
 }
 
 body.page-exit {
   opacity: 0;
+}
+
+body.section-features-active {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+body.section-services-active {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
 }
 
 .scroll-orb {
@@ -321,6 +329,7 @@ section {
 
 /* Features Section */
 .features {
+  position: relative;
   padding: 5rem 0;
   background: linear-gradient(180deg, var(--bg-color), var(--bg-secondary));
 }
@@ -445,6 +454,7 @@ section {
 
 /* Services Section */
 .services {
+  position: relative;
   padding: 5rem 0;
   background: linear-gradient(180deg, var(--bg-secondary), var(--surface-color));
 }

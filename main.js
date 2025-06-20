@@ -51,6 +51,35 @@ export function setupLinkTransitions() {
   return () => document.removeEventListener('click', handleClick);
 }
 
+export function initSectionBackgrounds() {
+  const sectionClasses = {
+    features: 'section-features-active',
+    services: 'section-services-active',
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          Object.values(sectionClasses).forEach((cls) =>
+            document.body.classList.remove(cls),
+          );
+          const cls = sectionClasses[entry.target.id];
+          if (cls) document.body.classList.add(cls);
+        }
+      });
+    },
+    { threshold: 0.5 },
+  );
+
+  Object.keys(sectionClasses).forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+
+  return observer;
+}
+
 if (window.location.protocol === 'file:') {
   document.addEventListener('DOMContentLoaded', () => {
     document.body.innerHTML =
@@ -64,6 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await initHeroAnimations();
   initParallax();
   initScrollOrb();
+  initSectionBackgrounds();
 
   const counters = document.querySelectorAll('.stat-number');
   const speed = 200;
