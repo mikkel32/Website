@@ -793,6 +793,22 @@ body.dark-mode .scroll-orb {
     opacity: 0;
   }
 }
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
 /* Responsive Design */
 @media (width <= 768px) {
   .nav-menu {
@@ -867,7 +883,7 @@ body.dark-mode .scroll-orb {
 }
 
 #preloader.fade-out {
-  opacity: 0;
+  animation: fade-out 0.3s ease forwards;
   pointer-events: none;
 }
 
@@ -878,6 +894,7 @@ body.dark-mode .scroll-orb {
   filter: drop-shadow(var(--shadow-glow));
   margin: 0 auto;
   display: block;
+  animation: pulse 1.2s ease-in-out infinite;
 }
 
 .preloader-progress {
@@ -1321,6 +1338,9 @@ body.dark-mode .search-box {
   .shield-animation {
     animation: none !important;
     transition: none !important;
+  }
+  .preloader-shield {
+    animation: none !important;
   }
   .hero-cinematic {
     perspective: none !important;
