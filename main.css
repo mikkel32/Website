@@ -167,7 +167,7 @@ section {
 }
 
 .logo i {
-  margin-right: 0.5rem;
+  margin-left: 0.5rem;
   font-size: 1.8rem;
 }
 
@@ -801,6 +801,14 @@ body.dark-mode .scroll-orb {
     transform: scale(1.1);
   }
 }
+@keyframes spin-scale {
+  from {
+    transform: rotate(0deg) scale(0.5);
+  }
+  to {
+    transform: rotate(360deg) scale(1);
+  }
+}
 @keyframes fade-out {
   from {
     opacity: 1;
@@ -1351,14 +1359,6 @@ body.dark-mode .search-box {
   .preloader-shield {
     animation: none !important;
   }
-  .preloader-progress .progress-bar {
-    transition: none !important;
-  }
-  #preloader,
-  #preloader.fade-out {
-    animation: none !important;
-    transition: none !important;
-  }
   .hero-cinematic {
     perspective: none !important;
     backface-visibility: visible !important;
@@ -1400,4 +1400,5 @@ body.dark-mode .search-box {
     color: #000;
   }
 }
+
 /*# sourceMappingURL=main.css.map */
