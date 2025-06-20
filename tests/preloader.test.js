@@ -214,4 +214,50 @@ describe('initPreloader', () => {
     preloader.dispatchEvent(new Event('transitionend'));
     await preloadPromise;
   });
+
+  test('tracks images added after initialization with src set', async () => {
+    jest.resetModules();
+    const animate = jest.fn(() => ({ finished: Promise.resolve() }));
+    const timeline = { add: jest.fn(), finished: Promise.resolve() };
+    const createTimeline = jest.fn(() => timeline);
+    jest.unstable_mockModule('../anime-loader.js', () => ({ getAnime: () => Promise.resolve({ animate, createTimeline }) }));
+    const { initPreloader } = await import('../preloader.js');
+    window.matchMedia = jest.fn().mockReturnValue({ matches: true });
+
+    document.body.innerHTML = `
+      <div id="preloader" aria-hidden="true">
+        <svg class="preloader-shield"></svg>
+        <div class="preloader-progress">
+          <div class="progress-bar"></div>
+          <span class="progress-text" aria-live="polite"></span>
+        </div>
+      </div>`;
+
+    const base = document.createElement('img');
+    base.src = 'a.jpg';
+    document.body.appendChild(base);
+
+    jest.useFakeTimers();
+    const preloadPromise = initPreloader({ timeout: 1000 });
+    await Promise.resolve();
+
+    const progressBar = document.querySelector('.progress-bar');
+    expect(progressBar.style.width).toBe('0%');
+
+    const dynamic = document.createElement('img');
+    dynamic.src = 'b.jpg';
+    document.body.appendChild(dynamic);
+    await Promise.resolve();
+
+    base.dispatchEvent(new Event('load'));
+    expect(progressBar.style.width).toBe('50%');
+
+    dynamic.dispatchEvent(new Event('load'));
+
+    expect(progressBar.style.width).toBe('100%');
+
+    const preloader = document.getElementById('preloader');
+    preloader.dispatchEvent(new Event('transitionend'));
+    await preloadPromise;
+  });
 });

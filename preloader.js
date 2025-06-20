@@ -137,20 +137,37 @@ export async function initPreloader(options = {}) {
     const images = Array.from(document.images).filter((img) => !isPlaceholder(img));
     images.forEach((img) => track(img, img.complete));
 
-    observer = new MutationObserver((mutations) => {
-      mutations.forEach((m) => {
-        if (m.type !== 'attributes') return;
-        const el = m.target;
-        if (m.attributeName === 'src') {
-          if (el.tagName === 'IMG' && !isPlaceholder(el)) {
-            track(el, el.complete);
-          } else if (el.tagName === 'SCRIPT' && typeof el.dataset.src !== 'undefined') {
+    const checkAndTrack = (el) => {
+      if (el.hasAttribute && el.hasAttribute('src')) {
+        if (el.tagName === 'IMG' && !isPlaceholder(el)) {
+          track(el, el.complete);
+        } else if (el.tagName === 'SCRIPT') {
+          if (typeof el.dataset.src !== 'undefined') {
+            track(el, el.readyState === 'complete' || el.readyState === 'loaded');
+          } else {
             track(el, el.readyState === 'complete' || el.readyState === 'loaded');
           }
-        } else if (m.attributeName === 'href') {
-          if (el.tagName === 'LINK' && el.rel === 'preload' && el.getAttribute('as') === 'font') {
-            track(el);
-          }
+        }
+      }
+      if (el.hasAttribute && el.hasAttribute('href')) {
+        if (el.tagName === 'LINK' && el.rel === 'preload' && el.getAttribute('as') === 'font') {
+          track(el);
+        }
+      }
+    };
+
+    observer = new MutationObserver((mutations) => {
+      mutations.forEach((m) => {
+        if (m.type === 'attributes') {
+          checkAndTrack(m.target);
+        } else if (m.type === 'childList') {
+          m.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              checkAndTrack(node);
+              node.querySelectorAll &&
+                node.querySelectorAll('[src],[href]').forEach((el) => checkAndTrack(el));
+            }
+          });
         }
       });
     });
@@ -158,6 +175,7 @@ export async function initPreloader(options = {}) {
       attributes: true,
       subtree: true,
       attributeFilter: ['src', 'href'],
+      childList: true,
     });
 
     Array.from(document.querySelectorAll('script[src]')).forEach((s) => {
