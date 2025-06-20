@@ -46,6 +46,7 @@ export async function initPreloader() {
   const images = Array.from(document.images);
   let loaded = images.filter((img) => img.complete).length;
   const total = images.length;
+  const tracked = [];
 
   return new Promise((resolve) => {
     function finish() {
@@ -53,6 +54,10 @@ export async function initPreloader() {
       progressBar.style.width = '100%';
       progressBar.removeAttribute('aria-valuenow');
       document.body.removeAttribute('aria-busy');
+      tracked.forEach(({ img, handler }) => {
+        img.removeEventListener('load', handler);
+        img.removeEventListener('error', handler);
+      });
       preloader.classList.add('fade-out');
       preloader.addEventListener(
         'transitionend',
@@ -78,19 +83,19 @@ export async function initPreloader() {
     }
   }, 50);
 
-  const onLoad = () => {
-    loaded += 1;
-    if (loaded === total) {
-      progressBar.style.width = '100%';
-      progressBar.setAttribute('aria-valuenow', '100');
+  images.forEach((img) => {
+    if (!img.complete) {
+      const handler = () => {
+        loaded += 1;
+        if (loaded === total) {
+          progressBar.style.width = '100%';
+          progressBar.setAttribute('aria-valuenow', '100');
+        }
+      };
+      tracked.push({ img, handler });
+      img.addEventListener('load', handler);
+      img.addEventListener('error', handler);
     }
-  };
-
-    images.forEach((img) => {
-      if (!img.complete) {
-        img.addEventListener('load', onLoad);
-        img.addEventListener('error', onLoad);
-      }
-    });
+  });
   });
 }
