@@ -107,6 +107,30 @@ body.section-services-active {
   overflow: hidden;
 }
 
+/* Decorative parallax elements */
+.features-deco {
+  position: absolute;
+  top: -50px;
+  right: 10%;
+  width: 150px;
+  height: 150px;
+  pointer-events: none;
+}
+
+.services-deco {
+  position: absolute;
+  bottom: -60px;
+  left: 5%;
+  width: 200px;
+  height: 200px;
+  pointer-events: none;
+}
+
+.file-protocol-message {
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
 section {
   scroll-margin-top: 90px;
 }
@@ -117,7 +141,8 @@ section {
   top: 0;
   width: 100%;
   background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+          backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -425,7 +450,8 @@ section {
 
 .feature-card {
   background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.4);
   padding: 2rem;
   border-radius: 12px;
@@ -521,7 +547,8 @@ section {
   margin-bottom: 3rem;
   padding: 2rem;
   background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 12px;
   box-shadow: var(--card-shadow);
@@ -830,6 +857,7 @@ body.dark-mode .scroll-orb {
   height: 100%;
   background: var(--bg-color);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 9999;
@@ -842,20 +870,44 @@ body.dark-mode .scroll-orb {
   pointer-events: none;
 }
 
-.loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-top-color: var(--accent-color);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.preloader-shield {
+  width: 64px;
+  height: 64px;
+  fill: var(--primary-color);
+  filter: drop-shadow(var(--shadow-glow));
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.preloader-progress {
+  width: 80%;
+  max-width: 300px;
+  height: 8px;
+  margin-top: 1.5rem;
+  border-radius: var(--radius-md);
+  background: var(--border-light);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
+
+.preloader-progress .progress-bar {
+  width: 0;
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+
+body.dark-mode #preloader .preloader-shield {
+  fill: var(--primary-light);
+}
+
+body.dark-mode #preloader .preloader-progress {
+  background: var(--border-color);
+}
+
+body.dark-mode #preloader .progress-bar {
+  background: var(--accent-color);
+}
+
 /* Scroll to Top Button */
 .scroll-top {
   position: fixed;
@@ -1010,7 +1062,8 @@ body.dark-mode .demo-card {
   border-radius: 5px;
   font-size: 1rem;
   background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+          backdrop-filter: blur(5px);
   transition: border-color 0.3s ease;
 }
 
@@ -1307,3 +1360,4 @@ body.dark-mode .search-box {
     color: #000;
   }
 }
+/*# sourceMappingURL=main.css.map */
