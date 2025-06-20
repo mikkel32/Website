@@ -219,6 +219,12 @@ section {
   background-size: cover;
 }
 
+.hero-cinematic {
+  perspective: 1000px;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
 .hero-content {
   max-width: 1200px;
   margin: 0 auto;
@@ -1248,6 +1254,11 @@ body.dark-mode .search-box {
   .shield-animation {
     animation: none !important;
     transition: none !important;
+  }
+  .hero-cinematic {
+    perspective: none !important;
+    backface-visibility: visible !important;
+    transform: none !important;
   }
 }
 /* Responsive improvements */

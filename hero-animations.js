@@ -76,6 +76,34 @@ export async function initHeroAnimations() {
     subtitleEl.textContent = '';
   }
 
+  const cinematicTl = timeline({ easing: 'easeOutCubic', duration: 800 });
+
+  cinematicTl
+    .add({
+      targets: '.hero-cinematic',
+      opacity: [0, 1],
+      scale: [0.8, 1],
+      duration: 600,
+    })
+    .add({
+      targets: '.hero-cinematic',
+      transform: [
+        'perspective(400px) rotateX(-20deg) translateZ(-80px)',
+        'perspective(1000px) rotateX(0deg) translateZ(0)',
+      ],
+      duration: 800,
+    }, 0)
+    .add({
+      targets: '.hero-shapes .shape',
+      opacity: [0, 0.6],
+      translateZ: [-80, 0],
+      delay: stagger(100),
+      easing: 'easeOutCubic',
+      duration: 700,
+    });
+
+  await cinematicTl.finished;
+
   const tl = timeline({ easing: 'easeOutCubic', duration: 700 });
 
   tl.add({
@@ -100,14 +128,6 @@ export async function initHeroAnimations() {
     easing: 'easeOutBack',
   });
 
-  animate('.hero-shapes .shape', {
-    opacity: [0, 0.6],
-    scale: [0.8, 1],
-    rotate: [-90, 0],
-    delay: stagger(150, { start: 500 }),
-    duration: 1000,
-    easing: 'easeOutBack',
-  });
 
   animate('.hero-shapes .shape', {
     translateX: [0, 40],
