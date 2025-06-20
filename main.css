@@ -76,6 +76,10 @@ body {
   transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
 }
 
+body.page-exit {
+  opacity: 0;
+}
+
 .scroll-orb {
   position: fixed;
   top: 50%;
@@ -105,8 +109,7 @@ section {
   top: 0;
   width: 100%;
   background: rgba(255, 255, 255, 0.6);
-  -webkit-backdrop-filter: blur(20px);
-          backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -237,6 +240,16 @@ section {
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 2rem;
   animation: fade-in-up 0.8s ease 0.2s both;
+}
+.hero-subtitle.typing::after {
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 0.1em;
+  background: currentColor;
+  vertical-align: bottom;
+  animation: blink-cursor 1s steps(2, start) infinite;
 }
 
 .hero-buttons {
@@ -397,8 +410,7 @@ section {
 
 .feature-card {
   background: rgba(255, 255, 255, 0.7);
-  -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.4);
   padding: 2rem;
   border-radius: 12px;
@@ -492,8 +504,7 @@ section {
   margin-bottom: 3rem;
   padding: 2rem;
   background: rgba(255, 255, 255, 0.7);
-  -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 12px;
   box-shadow: var(--card-shadow);
@@ -727,6 +738,14 @@ body.dark-mode .scroll-orb {
   }
   50% {
     transform: translateY(-50%) translateX(20px);
+  }
+}
+@keyframes blink-cursor {
+  0%, 50% {
+    opacity: 1;
+  }
+  50.01%, 100% {
+    opacity: 0;
   }
 }
 /* Responsive Design */
@@ -974,8 +993,7 @@ body.dark-mode .demo-card {
   border-radius: 5px;
   font-size: 1rem;
   background: rgba(255, 255, 255, 0.6);
-  -webkit-backdrop-filter: blur(5px);
-          backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
   transition: border-color 0.3s ease;
 }
 

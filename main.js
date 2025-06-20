@@ -8,6 +8,49 @@ import { initHeroAnimations } from './hero-animations.js';
 import { initScrollOrb } from './scroll-orb.js';
 import { initParallax } from './parallax.js';
 
+export function setupLinkTransitions() {
+  const reset = () => document.body.classList.remove('page-exit');
+
+  const handleClick = (e) => {
+    if (
+      e.defaultPrevented ||
+      e.button !== 0 ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.shiftKey ||
+      e.altKey
+    ) {
+      return;
+    }
+
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+
+    const url = new URL(link.href, window.location.href);
+    if (
+      link.target === '_blank' ||
+      url.origin !== window.location.origin ||
+      (url.hash && url.pathname === window.location.pathname)
+    ) {
+      return;
+    }
+
+    e.preventDefault();
+    document.body.classList.add('page-exit');
+    const navigate = () => {
+      document.body.removeEventListener('transitionend', navigate);
+      window.location.assign(link.href);
+    };
+    document.body.addEventListener('transitionend', navigate);
+  };
+
+  document.addEventListener('click', handleClick);
+  window.addEventListener('pageshow', reset);
+  window.addEventListener('load', reset);
+
+  return () => document.removeEventListener('click', handleClick);
+}
+
 if (window.location.protocol === 'file:') {
   document.addEventListener('DOMContentLoaded', () => {
     document.body.innerHTML =
@@ -204,13 +247,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   );
   lazyImages.forEach((img) => imageObserver.observe(img));
 
-  window.addEventListener('beforeunload', () => {
-    document.body.style.opacity = '0';
-  });
-
-  const resetOpacity = () => {
-    document.body.style.opacity = '1';
-  };
-  window.addEventListener('load', resetOpacity);
-  window.addEventListener('pageshow', resetOpacity);
+  setupLinkTransitions();
 });
