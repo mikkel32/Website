@@ -371,9 +371,10 @@ section {
   border: 1px solid rgb(255 255 255 / 40%);
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: var(--card-shadow);
+  box-shadow: var(--shadow-md);
   text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
 
 /* Enhanced animations */

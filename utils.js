@@ -77,3 +77,31 @@ export function getCSRFToken() {
 export function validateCSRFToken(token) {
   return token === sessionStorage.getItem('csrfToken');
 }
+
+export function attachTiltEffect(el) {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return () => {};
+
+  const maxTilt = 10;
+
+  const onMove = (e) => {
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rotateX = ((rect.height / 2 - y) / (rect.height / 2)) * maxTilt;
+    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * maxTilt;
+    el.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  };
+
+  const onLeave = () => {
+    el.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  };
+
+  el.addEventListener('mousemove', onMove);
+  el.addEventListener('mouseleave', onLeave);
+
+  return () => {
+    el.removeEventListener('mousemove', onMove);
+    el.removeEventListener('mouseleave', onLeave);
+  };
+}

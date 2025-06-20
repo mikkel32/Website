@@ -117,8 +117,7 @@ section {
   top: 0;
   width: 100%;
   background: rgba(255, 255, 255, 0.6);
-  -webkit-backdrop-filter: blur(20px);
-          backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   z-index: 1000;
@@ -426,14 +425,14 @@ section {
 
 .feature-card {
   background: rgba(255, 255, 255, 0.7);
-  -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.4);
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: var(--card-shadow);
+  box-shadow: var(--shadow-md);
   text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
 
 /* Enhanced animations */
@@ -522,8 +521,7 @@ section {
   margin-bottom: 3rem;
   padding: 2rem;
   background: rgba(255, 255, 255, 0.7);
-  -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 12px;
   box-shadow: var(--card-shadow);
@@ -1012,8 +1010,7 @@ body.dark-mode .demo-card {
   border-radius: 5px;
   font-size: 1rem;
   background: rgba(255, 255, 255, 0.6);
-  -webkit-backdrop-filter: blur(5px);
-          backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
   transition: border-color 0.3s ease;
 }
 
@@ -1310,5 +1307,3 @@ body.dark-mode .search-box {
     color: #000;
   }
 }
-
-/*# sourceMappingURL=main.css.map */

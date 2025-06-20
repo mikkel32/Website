@@ -3,7 +3,12 @@ import { initTheme, initNavigation } from './theme.js';
 import { initSearch } from './search.js';
 import { NotificationSystem, initNotificationToggle } from './notifications.js';
 import { setupSecurityDemo, securityFeatures } from './security-demo.js';
-import { validateForm, getCSRFToken, validateCSRFToken } from './utils.js';
+import {
+  validateForm,
+  getCSRFToken,
+  validateCSRFToken,
+  attachTiltEffect,
+} from './utils.js';
 import { initHeroAnimations } from './hero-animations.js';
 import { initScrollOrb } from './scroll-orb.js';
 import { initParallax } from './parallax.js';
@@ -141,6 +146,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.querySelectorAll('.feature-card, .service-item, .stat-item').forEach((el) => {
     el.classList.add('reveal');
     observer.observe(el);
+  });
+
+  document.querySelectorAll('.feature-card').forEach((card) => {
+    attachTiltEffect(card);
   });
 
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
