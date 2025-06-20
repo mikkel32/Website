@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { jest } from '@jest/globals';
 
 test('error capture not loaded in production', async () => {

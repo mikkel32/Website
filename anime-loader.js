@@ -16,7 +16,6 @@ async function loadFromCDN() {
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('');
     if (hashHex !== EXPECTED_CDN_HASH) {
-      console.warn('Anime.js CDN hash mismatch. Animations disabled.');
       return null;
     }
     const blob = new Blob([text], { type: 'application/javascript' });
@@ -24,8 +23,7 @@ async function loadFromCDN() {
     const mod = await import(blobURL);
     URL.revokeObjectURL(blobURL);
     return mod;
-  } catch (err) {
-    console.error('Failed to load Anime.js from CDN', err);
+  } catch {
     return null;
   }
 }
@@ -58,7 +56,9 @@ async function importWithMap(spec) {
       if (resolved) {
         try {
           return await import(resolved);
-        } catch {}
+        } catch {
+          /* ignore */
+        }
       }
     }
     throw err;
@@ -70,12 +70,10 @@ export async function getAnime() {
 
   try {
     animeModule = await importWithMap('animejs');
-  } catch (err) {
-    console.warn('Local Anime.js not found, trying bundled copy...', err);
+  } catch {
     try {
       animeModule = await import('./anime.bundle.mjs');
-    } catch (bundleErr) {
-      console.warn('Bundled Anime.js failed, falling back to CDN...', bundleErr);
+    } catch {
       animeModule = await loadFromCDN();
     }
   }
