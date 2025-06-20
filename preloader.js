@@ -60,34 +60,36 @@ export async function initPreloader(options = {}) {
   const isPlaceholder = (img) =>
     img.src.startsWith('data:') && img.naturalWidth <= 1 && img.naturalHeight <= 1;
 
-  const assets = [];
-  const tracked = [];
+  const assets = new Set();
+  const tracked = new Map();
   let loaded = 0;
   let resolveFn;
+  let observer;
 
   function updateProgress() {
-    const progress = assets.length ? Math.min(100, (loaded / assets.length) * 100) : 100;
+    const total = assets.size;
+    const progress = total ? Math.min(100, (loaded / total) * 100) : 100;
     progressBar.style.width = `${progress}%`;
     progressBar.setAttribute('aria-valuenow', String(Math.round(progress)));
     if (progressText) progressText.textContent = `${Math.round(progress)}%`;
   }
 
   function maybeFinish() {
-    if (loaded >= assets.length) {
+    if (loaded >= assets.size) {
       finish();
     }
   }
 
   function track(el, alreadyLoaded = false) {
-    if (assets.includes(el)) return;
-    assets.push(el);
+    if (assets.has(el)) return;
+    assets.add(el);
     const handler = () => {
       loaded += 1;
       updateProgress();
       el.removeEventListener('load', handler);
       el.removeEventListener('error', handler);
-      const index = tracked.findIndex((t) => t.el === el);
-      if (index !== -1) tracked.splice(index, 1);
+      const handlerRef = tracked.get(el);
+      if (handlerRef) tracked.delete(el);
       maybeFinish();
     };
 
@@ -98,7 +100,7 @@ export async function initPreloader(options = {}) {
     } else {
       el.addEventListener('load', handler);
       el.addEventListener('error', handler);
-      tracked.push({ el, handler });
+      tracked.set(el, handler);
     }
   }
 
@@ -108,10 +110,13 @@ export async function initPreloader(options = {}) {
     progressBar.removeAttribute('aria-valuenow');
     if (progressText) progressText.textContent = '100%';
     document.body.removeAttribute('aria-busy');
-    tracked.forEach(({ el, handler }) => {
+    tracked.forEach((handler, el) => {
       el.removeEventListener('load', handler);
       el.removeEventListener('error', handler);
     });
+    if (observer) {
+      observer.disconnect();
+    }
     preloader.classList.add('fade-out');
     preloader.addEventListener(
       'transitionend',
@@ -132,7 +137,7 @@ export async function initPreloader(options = {}) {
     const images = Array.from(document.images).filter((img) => !isPlaceholder(img));
     images.forEach((img) => track(img, img.complete));
 
-    const observer = new MutationObserver((mutations) => {
+    observer = new MutationObserver((mutations) => {
       mutations.forEach((m) => {
         if (m.type !== 'attributes') return;
         const el = m.target;
@@ -164,7 +169,7 @@ export async function initPreloader(options = {}) {
     });
 
     if (document.fonts) {
-      assets.push(document.fonts);
+      assets.add(document.fonts);
       if (document.fonts.status === 'loaded') {
         loaded += 1;
         updateProgress();
@@ -179,11 +184,11 @@ export async function initPreloader(options = {}) {
         };
         document.fonts.addEventListener('loadingdone', fontHandler);
         document.fonts.addEventListener('loadingerror', fontHandler);
-        tracked.push({ el: document.fonts, handler: fontHandler });
+        tracked.set(document.fonts, fontHandler);
       }
     }
 
-    if (assets.length === 0) {
+    if (assets.size === 0) {
       finish();
     } else {
       updateProgress();
