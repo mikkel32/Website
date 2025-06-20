@@ -110,3 +110,23 @@ describe('initHeroAnimations reduced motion', () => {
     ).toBe('none');
   });
 });
+
+describe('initHeroAnimations fallback', () => {
+  test('skips animations when Anime.js fails to load', async () => {
+    jest.resetModules();
+    jest.unstable_mockModule('../anime-loader.js', () => ({
+      getAnime: () => Promise.resolve(null),
+    }));
+    const { initHeroAnimations } = await import('../hero-animations.js');
+    document.body.innerHTML = `
+      <div class="hero-cinematic">
+        <div class="hero-shapes"><span class="shape"></span></div>
+      </div>
+      <p class="hero-subtitle">Test</p>`;
+    window.matchMedia = jest.fn().mockReturnValue({ matches: false });
+    await initHeroAnimations();
+    expect(document.querySelector('.hero-subtitle').textContent).toBe('Test');
+    expect(document.querySelector('.hero-cinematic').style.transform).toBe('none');
+    expect(document.querySelector('.hero-shapes .shape').style.transform).toBe('none');
+  });
+});
