@@ -54,4 +54,35 @@ describe('initPreloader', () => {
     expect(opts.rotate).toBeUndefined();
     expect(opts.scale).toEqual([1, 1.1]);
   });
+
+  test('skips animations and shows progress instantly when prefers-reduced-motion', async () => {
+    jest.resetModules();
+    const animate = jest.fn(() => ({ finished: Promise.resolve() }));
+    const createTimeline = jest.fn(() => ({ add: jest.fn(), finished: Promise.resolve() }));
+    jest.unstable_mockModule('../anime-loader.js', () => ({ getAnime: () => Promise.resolve({ animate, createTimeline }) }));
+    const { initPreloader } = await import('../preloader.js');
+    window.matchMedia = jest.fn().mockReturnValue({ matches: true });
+
+    document.body.innerHTML = `
+      <div id="preloader" aria-hidden="true">
+        <svg class="preloader-shield"></svg>
+        <div class="preloader-progress">
+          <div class="progress-bar"></div>
+          <span class="progress-text" aria-live="polite"></span>
+        </div>
+      </div>`;
+
+    jest.useFakeTimers();
+    initPreloader();
+    await Promise.resolve();
+
+    const progressBar = document.querySelector('.progress-bar');
+    const progressText = document.querySelector('.progress-text');
+
+    expect(progressBar.style.width).toBe('100%');
+    expect(progressBar.getAttribute('aria-valuenow')).toBe('100');
+    expect(progressText.textContent).toBe('100%');
+    jest.advanceTimersByTime(100);
+    expect(animate).not.toHaveBeenCalled();
+  });
 });
