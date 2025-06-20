@@ -45,10 +45,9 @@ export async function initPreloader(options = {}) {
     });
   } else {
     shield.style.opacity = '0';
-    const introTl = createTimeline({ easing: 'linear', duration: 400 });
-    introTl.add({
-      targets: shield,
-      opacity: [0, 1],
+    shield.style.transition = 'opacity 0.4s linear';
+    requestAnimationFrame(() => {
+      shield.style.opacity = '1';
     });
     progressBar.style.transition = 'none';
   }

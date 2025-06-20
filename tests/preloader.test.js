@@ -103,18 +103,17 @@ describe('initPreloader', () => {
     img.dispatchEvent(new Event('load'));
 
     expect(progressBar.style.width).toBe('100%');
+    const shield = document.querySelector('.preloader-shield');
     const preloader = document.getElementById('preloader');
+    jest.runAllTimers();
     preloader.dispatchEvent(new Event('transitionend'));
     await preloaderPromise;
 
     expect(progressText.textContent).toBe('100%');
-    expect(createTimeline).toHaveBeenCalledWith({ easing: 'linear', duration: 400 });
-    expect(timeline.add).toHaveBeenCalledWith(
-      expect.objectContaining({
-        targets: expect.anything(),
-        opacity: [0, 1],
-      }),
-    );
+    expect(shield.style.transition).toBe('opacity 0.4s linear');
+    expect(shield.style.opacity).toBe('1');
+    expect(createTimeline).not.toHaveBeenCalled();
+    expect(timeline.add).not.toHaveBeenCalled();
     expect(animate).not.toHaveBeenCalled();
   });
 
