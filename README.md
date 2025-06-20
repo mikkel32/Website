@@ -83,6 +83,18 @@ local images, data URIs, and the Unsplash images used in the demo load without t
 It further sets `connect-src 'self' https://cdn.jsdelivr.net` so that runtime
 `fetch` requests to jsDelivr succeed when loading bundled modules.
 
+### Unsplash CORS compatibility
+
+`security.py` sends `Cross-Origin-Embedder-Policy: require-corp`. Unsplash serves
+all gallery images with `cross-origin-resource-policy: cross-origin` and
+`access-control-allow-origin: *` headers, so the images load correctly without
+adding `crossorigin="anonymous"`. You can verify the headers with:
+
+```bash
+curl -I "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?auto=format&fit=crop&w=600&q=60"
+```
+
+
 Alternatively you can use the development server provided by Vite (requires Node.js and dependencies):
 
 ```bash
