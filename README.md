@@ -26,6 +26,7 @@ npm install -g sass
 
 ```bash
 npm install   # install dependencies such as Anime.js, fonts and icons
+npm run update-anime   # fetch the bundled Anime.js fallback (optional version)
 python security.py
 ```
 
@@ -79,6 +80,8 @@ response indicates how long clients should wait before retrying.
 
 The default Content Security Policy now includes `img-src 'self' data: https://images.unsplash.com` so that
 local images, data URIs, and the Unsplash images used in the demo load without triggering browser CSP errors.
+It further sets `connect-src 'self' https://cdn.jsdelivr.net` so that runtime
+`fetch` requests to jsDelivr succeed when loading bundled modules.
 
 Alternatively you can use the development server provided by Vite (requires Node.js and dependencies):
 
@@ -129,6 +132,8 @@ panel state and captured logs between visits.
 Chart.js powering the network activity visualization is loaded on demand when the dashboard initializes, reducing the amount of JavaScript downloaded on first load. The loader now tries the locally installed module first, then a bundled copy at `dashboard/chart.bundle.mjs` (mirrored under `public/dashboard` for production builds), and finally falls back to a version from [esm.sh](https://esm.sh/) if those fail. This guarantees the chart loads even when dependency resolution or network access break down.
 
 Run `npm run update-chart` anytime you want to refresh the bundled file with the latest Chart.js version. The script uses `curl` to download `?bundle` from esm.sh and writes it to both `dashboard/chart.bundle.mjs` and `public/dashboard/chart.bundle.mjs`.
+
+Run `npm run update-anime` to refresh the bundled Anime.js file used as a fallback by the hero animations. Pass a version number to retrieve that release, e.g. `npm run update-anime 4.0.2`. The script downloads the chosen version from jsDelivr and writes it to `anime.bundle.mjs` and `public/anime.bundle.mjs`.
 
 
 
