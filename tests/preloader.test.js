@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals';
 
 describe('initPreloader', () => {
-  test('invokes anime with pulse effect', async () => {
+  test('invokes anime with pulse effect and updates on asset events', async () => {
     jest.resetModules();
     const animate = jest.fn(() => ({ finished: Promise.resolve() }));
     const createTimeline = jest.fn(() => ({ add: jest.fn(), finished: Promise.resolve() }));
@@ -30,17 +30,22 @@ describe('initPreloader', () => {
     const removeSpy2 = jest.spyOn(img2, 'removeEventListener');
 
     jest.useFakeTimers();
-    initPreloader();
+    const preloaderPromise = initPreloader({ timeout: 1000 });
     await Promise.resolve();
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.querySelector('.progress-text');
 
-    jest.advanceTimersByTime(1500);
-    expect(progressText.textContent).toBe(
-      `${progressBar.getAttribute('aria-valuenow')}%`,
-    );
+    expect(progressBar.style.width).toBe('0%');
 
-    jest.advanceTimersByTime(1500);
+    img1.dispatchEvent(new Event('load'));
+    expect(progressBar.style.width).toBe('50%');
+
+    img2.dispatchEvent(new Event('error'));
+    expect(progressBar.style.width).toBe('100%');
+
+    const preloader = document.getElementById('preloader');
+    preloader.dispatchEvent(new Event('transitionend'));
+    await preloaderPromise;
 
     expect(addSpy1).toHaveBeenCalledWith('load', expect.any(Function));
     expect(addSpy2).toHaveBeenCalledWith('load', expect.any(Function));
@@ -55,7 +60,7 @@ describe('initPreloader', () => {
     expect(opts.scale).toEqual([1, 1.1]);
   });
 
-  test('skips animations and shows progress instantly when prefers-reduced-motion', async () => {
+  test('skips animations when prefers-reduced-motion', async () => {
     jest.resetModules();
     const animate = jest.fn(() => ({ finished: Promise.resolve() }));
     const createTimeline = jest.fn(() => ({ add: jest.fn(), finished: Promise.resolve() }));
@@ -73,20 +78,29 @@ describe('initPreloader', () => {
       </div>`;
 
     jest.useFakeTimers();
-    initPreloader();
+    const img = document.createElement('img');
+    img.src = 'x';
+    document.body.appendChild(img);
+
+    const preloaderPromise = initPreloader({ timeout: 1000 });
     await Promise.resolve();
 
     const progressBar = document.querySelector('.progress-bar');
     const progressText = document.querySelector('.progress-text');
 
+    expect(progressBar.style.width).toBe('0%');
+    img.dispatchEvent(new Event('load'));
+
     expect(progressBar.style.width).toBe('100%');
-    expect(progressBar.getAttribute('aria-valuenow')).toBe('100');
+    const preloader = document.getElementById('preloader');
+    preloader.dispatchEvent(new Event('transitionend'));
+    await preloaderPromise;
+
     expect(progressText.textContent).toBe('100%');
-    jest.advanceTimersByTime(100);
     expect(animate).not.toHaveBeenCalled();
   });
 
-  test('handles lazy loaded images', async () => {
+  test('handles lazy loaded images and timeout', async () => {
     jest.resetModules();
     const animate = jest.fn(() => ({ finished: Promise.resolve() }));
     const createTimeline = jest.fn(() => ({ add: jest.fn(), finished: Promise.resolve() }));
@@ -110,15 +124,13 @@ describe('initPreloader', () => {
     document.body.appendChild(lazy);
 
     jest.useFakeTimers();
-    const preloaderPromise = initPreloader();
+    const preloaderPromise = initPreloader({ timeout: 1000 });
     await Promise.resolve();
 
-    jest.advanceTimersByTime(3000);
+    jest.advanceTimersByTime(900);
     expect(document.getElementById('preloader')).not.toBeNull();
 
-    lazy.src = 'foo.jpg';
-    lazy.dispatchEvent(new Event('load'));
-    jest.advanceTimersByTime(100);
+    jest.advanceTimersByTime(200);
     const preloader = document.getElementById('preloader');
     preloader.dispatchEvent(new Event('transitionend'));
     await preloaderPromise;
