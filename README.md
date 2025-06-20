@@ -101,6 +101,8 @@ npm run dev
 - `main.css` – compiled CSS served when running `security.py`
 - `security-demo.js` – dynamic demo section with cryptography utilities such as
   AES encryption, hashing, and HMAC generation
+- `parallax.js` – scroll-based parallax effect for the hero background that
+  disables itself when `prefers-reduced-motion` is enabled
 - `tests/` – Jest unit tests for utilities and security features
 
 ## Diagnostics dashboard
