@@ -15,7 +15,7 @@ describe('initPreloader', () => {
         <svg class="preloader-shield"></svg>
         <div class="preloader-progress">
           <div class="progress-bar"></div>
-          <span class="progress-text" aria-live="polite"></span>
+          <span class="progress-text" aria-live="polite">0%</span>
         </div>
       </div>`;
 
@@ -84,7 +84,7 @@ describe('initPreloader', () => {
         <svg class="preloader-shield"></svg>
         <div class="preloader-progress">
           <div class="progress-bar"></div>
-          <span class="progress-text" aria-live="polite"></span>
+          <span class="progress-text" aria-live="polite">0%</span>
         </div>
       </div>`;
 
@@ -132,7 +132,7 @@ describe('initPreloader', () => {
         <svg class="preloader-shield"></svg>
         <div class="preloader-progress">
           <div class="progress-bar"></div>
-          <span class="progress-text" aria-live="polite"></span>
+          <span class="progress-text" aria-live="polite">0%</span>
         </div>
       </div>`;
 
@@ -185,7 +185,7 @@ describe('initPreloader', () => {
         <svg class="preloader-shield"></svg>
         <div class="preloader-progress">
           <div class="progress-bar"></div>
-          <span class="progress-text" aria-live="polite"></span>
+          <span class="progress-text" aria-live="polite">0%</span>
         </div>
       </div>`;
 
@@ -253,7 +253,7 @@ describe('initPreloader', () => {
         <svg class="preloader-shield"></svg>
         <div class="preloader-progress">
           <div class="progress-bar"></div>
-          <span class="progress-text" aria-live="polite"></span>
+          <span class="progress-text" aria-live="polite">0%</span>
         </div>
       </div>`;
 
@@ -304,7 +304,7 @@ describe('initPreloader', () => {
         <svg class="preloader-shield"></svg>
         <div class="preloader-progress">
           <div class="progress-bar"></div>
-          <span class="progress-text" aria-live="polite"></span>
+          <span class="progress-text" aria-live="polite">0%</span>
         </div>
       </div>`;
 
@@ -358,7 +358,7 @@ describe('initPreloader', () => {
         <svg class="preloader-shield"></svg>
         <div class="preloader-progress">
           <div class="progress-bar"></div>
-          <span class="progress-text" aria-live="polite"></span>
+          <span class="progress-text" aria-live="polite">0%</span>
         </div>
       </div>`;
 
