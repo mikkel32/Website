@@ -898,6 +898,7 @@ body.dark-mode .scroll-orb {
 }
 
 .preloader-progress {
+  position: relative;
   width: 80%;
   max-width: 300px;
   height: 8px;
@@ -914,6 +915,14 @@ body.dark-mode .scroll-orb {
   background: var(--primary-color);
   border-radius: inherit;
   transition: width 0.3s ease;
+}
+
+.preloader-progress .progress-text {
+  position: absolute;
+  top: -1.5rem;
+  right: 0;
+  font-size: 0.75rem;
+  color: var(--text-color);
 }
 
 body.dark-mode #preloader .preloader-shield {
