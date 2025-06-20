@@ -89,7 +89,7 @@ export function initSectionBackgrounds() {
 if (window.location.protocol === 'file:') {
   document.addEventListener('DOMContentLoaded', () => {
     document.body.innerHTML =
-      '<p style="padding:2rem;font-size:1.2rem">Please run this site via a local server (e.g., <code>python security.py</code>) to avoid CORS issues.</p>';
+      '<p class="file-protocol-message">Please run this site via a local server (e.g., <code>python security.py</code>) to avoid CORS issues.</p>';
   });
 }
 

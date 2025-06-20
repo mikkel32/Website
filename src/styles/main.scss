@@ -48,6 +48,30 @@ body.section-services-active {
   overflow: hidden;
 }
 
+/* Decorative parallax elements */
+.features-deco {
+  position: absolute;
+  top: -50px;
+  right: 10%;
+  width: 150px;
+  height: 150px;
+  pointer-events: none;
+}
+
+.services-deco {
+  position: absolute;
+  bottom: -60px;
+  left: 5%;
+  width: 200px;
+  height: 200px;
+  pointer-events: none;
+}
+
+.file-protocol-message {
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
 section {
   scroll-margin-top: 90px;
 }
