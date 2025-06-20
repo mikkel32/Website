@@ -6,6 +6,7 @@ import { setupSecurityDemo, securityFeatures } from './security-demo.js';
 import { validateForm, getCSRFToken, validateCSRFToken } from './utils.js';
 import { initHeroAnimations } from './hero-animations.js';
 import { initScrollOrb } from './scroll-orb.js';
+import { initParallax } from './parallax.js';
 
 if (window.location.protocol === 'file:') {
   document.addEventListener('DOMContentLoaded', () => {
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
   const navMenu = initNavigation();
   await initHeroAnimations();
+  initParallax();
   initScrollOrb();
 
   const counters = document.querySelectorAll('.stat-number');
