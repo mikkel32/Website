@@ -2,6 +2,17 @@
 // when served by a simple HTTP server without a bundler.
 let animeModule;
 
+export async function typeSubtitle(element, text, interval = 50) {
+  element.textContent = '';
+  element.classList.add('typing');
+  for (const char of text) {
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((r) => setTimeout(r, interval));
+    element.textContent += char;
+  }
+  element.classList.remove('typing');
+}
+
 const CDN_URL =
   'https://cdn.jsdelivr.net/npm/animejs@4.0.2/lib/anime.esm.min.js';
 // sha256 hash of the file at CDN_URL (hex encoded)
@@ -59,6 +70,12 @@ export async function initHeroAnimations() {
 
   const { animate, stagger, timeline } = animeModule;
 
+  const subtitleEl = document.querySelector('.hero-subtitle');
+  const subtitleText = subtitleEl?.textContent || '';
+  if (subtitleEl) {
+    subtitleEl.textContent = '';
+  }
+
   const tl = timeline({ easing: 'easeOutCubic', duration: 700 });
 
   tl.add({
@@ -66,11 +83,6 @@ export async function initHeroAnimations() {
     opacity: [0, 1],
     translateY: [40, 0],
   })
-    .add({
-      targets: '.hero-subtitle',
-      opacity: [0, 1],
-      translateY: [40, 0],
-    }, '-=400')
     .add({
       targets: '.hero-buttons .btn',
       opacity: [0, 1],
@@ -107,4 +119,15 @@ export async function initHeroAnimations() {
     delay: stagger(200, { start: 1200 }),
     duration: 6000,
   });
+
+  if (subtitleEl) {
+    await tl.finished;
+    await animate(subtitleEl, {
+      opacity: [0, 1],
+      translateY: [40, 0],
+      duration: 600,
+      easing: 'easeOutCubic',
+    }).finished;
+    await typeSubtitle(subtitleEl, subtitleText, 75);
+  }
 }
