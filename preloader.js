@@ -1,6 +1,7 @@
 import { getAnime } from './anime-loader.js';
 
-export async function initPreloader() {
+export async function initPreloader(options = {}) {
+  const { timeout = 5000 } = options;
   const preloader = document.getElementById('preloader');
   if (!preloader) return Promise.resolve();
 
@@ -20,8 +21,8 @@ export async function initPreloader() {
   }
 
   document.body.setAttribute('aria-busy', 'true');
-  progressBar.setAttribute('aria-valuenow', reduceMotion ? '100' : '0');
-  if (progressText) progressText.textContent = reduceMotion ? '100%' : '0%';
+  progressBar.setAttribute('aria-valuenow', '0');
+  if (progressText) progressText.textContent = '0%';
 
   if (!reduceMotion) {
     const introTl = createTimeline({ easing: 'easeOutCubic', duration: 400 });
@@ -41,112 +42,131 @@ export async function initPreloader() {
   } else {
     shield.style.opacity = '1';
     shield.style.transform = 'none';
-    progressBar.style.width = '100%';
-    progressBar.setAttribute('aria-valuenow', '100');
-    if (progressText) progressText.textContent = '100%';
+    progressBar.style.transition = 'none';
   }
-
-  const duration = 3000;
-  const start = Date.now();
 
   const isPlaceholder = (img) =>
-    img.src.startsWith('data:') &&
-    img.naturalWidth <= 1 &&
-    img.naturalHeight <= 1;
+    img.src.startsWith('data:') && img.naturalWidth <= 1 && img.naturalHeight <= 1;
 
-  const images = Array.from(document.images).filter((img) => !isPlaceholder(img));
-  const lazyImages = Array.from(document.querySelectorAll('img[data-src]')).filter(
-    (img) => isPlaceholder(img),
-  );
-  let loaded = images.filter((img) => img.complete).length;
-  let total = images.length;
+  const assets = [];
   const tracked = [];
+  let loaded = 0;
+  let resolveFn;
 
-  return new Promise((resolve) => {
-    function finish() {
-      clearInterval(timer);
-      progressBar.style.width = '100%';
-      progressBar.removeAttribute('aria-valuenow');
-      if (progressText) progressText.textContent = '100%';
-      document.body.removeAttribute('aria-busy');
-      tracked.forEach(({ img, handler }) => {
-        img.removeEventListener('load', handler);
-        img.removeEventListener('error', handler);
-      });
-      preloader.classList.add('fade-out');
-      preloader.addEventListener(
-        'transitionend',
-        () => {
-          preloader.remove();
-          document.body.classList.remove('no-scroll');
-          resolve();
-        },
-        { once: true },
-      );
-    }
-
-  function trackImage(img) {
-    if (img.complete) {
-      return;
-    }
-    const handler = () => {
-      loaded += 1;
-      if (loaded === total && !reduceMotion) {
-        progressBar.style.width = '100%';
-        progressBar.setAttribute('aria-valuenow', '100');
-        if (progressText) progressText.textContent = '100%';
-      }
-      img.removeEventListener('load', handler);
-      img.removeEventListener('error', handler);
-    };
-    tracked.push({ img, handler });
-    img.addEventListener('load', handler);
-    img.addEventListener('error', handler);
-  }
-
-  const timer = setInterval(() => {
-    const elapsed = Date.now() - start;
-    if (reduceMotion) {
-      if (loaded === total || elapsed >= duration) {
-        finish();
-      }
-      return;
-    }
-    let progress = Math.min(100, (elapsed / duration) * 100);
-    if (loaded === total) {
-      progress = 100;
-    }
+  function updateProgress() {
+    const progress = assets.length ? Math.min(100, (loaded / assets.length) * 100) : 100;
     progressBar.style.width = `${progress}%`;
     progressBar.setAttribute('aria-valuenow', String(Math.round(progress)));
     if (progressText) progressText.textContent = `${Math.round(progress)}%`;
-    if (progress >= 100) {
+  }
+
+  function maybeFinish() {
+    if (loaded >= assets.length) {
       finish();
     }
-  }, 50);
+  }
 
-  images.forEach((img) => {
-    if (!img.complete) trackImage(img);
-  });
+  function track(el, alreadyLoaded = false) {
+    assets.push(el);
+    const handler = () => {
+      loaded += 1;
+      updateProgress();
+      el.removeEventListener('load', handler);
+      el.removeEventListener('error', handler);
+      const index = tracked.findIndex((t) => t.el === el);
+      if (index !== -1) tracked.splice(index, 1);
+      maybeFinish();
+    };
 
-  if (lazyImages.length) {
-    const mo = new MutationObserver((mutations) => {
-      mutations.forEach((m) => {
-        if (m.type === 'attributes' && m.attributeName === 'src') {
-          const img = m.target;
-          if (!isPlaceholder(img)) {
-            total += 1;
-            if (img.complete) {
-              loaded += 1;
-            } else {
-              trackImage(img);
-            }
-          }
-        }
-      });
+    if (alreadyLoaded) {
+      loaded += 1;
+      updateProgress();
+      maybeFinish();
+    } else {
+      el.addEventListener('load', handler);
+      el.addEventListener('error', handler);
+      tracked.push({ el, handler });
+    }
+  }
+
+  function finish() {
+    clearTimeout(timeoutId);
+    progressBar.style.width = '100%';
+    progressBar.removeAttribute('aria-valuenow');
+    if (progressText) progressText.textContent = '100%';
+    document.body.removeAttribute('aria-busy');
+    tracked.forEach(({ el, handler }) => {
+      el.removeEventListener('load', handler);
+      el.removeEventListener('error', handler);
     });
-    lazyImages.forEach((img) =>
-      mo.observe(img, { attributes: true, attributeFilter: ['src'] }),
+    preloader.classList.add('fade-out');
+    preloader.addEventListener(
+      'transitionend',
+      () => {
+        preloader.remove();
+        document.body.classList.remove('no-scroll');
+        resolveFn();
+      },
+      { once: true },
     );
   }
+
+  const timeoutId = setTimeout(finish, timeout);
+
+  return new Promise((resolve) => {
+    resolveFn = resolve;
+
+    const images = Array.from(document.images).filter((img) => !isPlaceholder(img));
+    images.forEach((img) => track(img, img.complete));
+
+    const lazyImages = Array.from(document.querySelectorAll('img[data-src]')).filter((img) => isPlaceholder(img));
+    if (lazyImages.length) {
+      const mo = new MutationObserver((mutations) => {
+        mutations.forEach((m) => {
+          if (m.type === 'attributes' && m.attributeName === 'src') {
+            const img = m.target;
+            if (!isPlaceholder(img)) {
+              track(img, img.complete);
+            }
+          }
+        });
+      });
+      lazyImages.forEach((img) => mo.observe(img, { attributes: true, attributeFilter: ['src'] }));
+    }
+
+    Array.from(document.querySelectorAll('script[src]')).forEach((s) => {
+      track(s, s.readyState === 'complete' || s.readyState === 'loaded');
+    });
+
+    Array.from(document.querySelectorAll('link[rel="stylesheet"]')).forEach((l) => {
+      track(l, l.sheet != null);
+    });
+
+    if (document.fonts) {
+      assets.push(document.fonts);
+      if (document.fonts.status === 'loaded') {
+        loaded += 1;
+        updateProgress();
+        maybeFinish();
+      } else {
+        const fontHandler = () => {
+          loaded += 1;
+          updateProgress();
+          document.fonts.removeEventListener('loadingdone', fontHandler);
+          document.fonts.removeEventListener('loadingerror', fontHandler);
+          maybeFinish();
+        };
+        document.fonts.addEventListener('loadingdone', fontHandler);
+        document.fonts.addEventListener('loadingerror', fontHandler);
+        tracked.push({ el: document.fonts, handler: fontHandler });
+      }
+    }
+
+    if (assets.length === 0) {
+      finish();
+    } else {
+      updateProgress();
+      maybeFinish();
+    }
   });
 }
