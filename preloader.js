@@ -14,6 +14,9 @@ export async function initPreloader() {
   const shield = preloader.querySelector('.preloader-shield');
   const progressBar = preloader.querySelector('.progress-bar');
 
+  document.body.setAttribute('aria-busy', 'true');
+  progressBar.setAttribute('aria-valuenow', '0');
+
   animate(shield, {
     rotate: '360deg',
     duration: 1000,
@@ -31,6 +34,8 @@ export async function initPreloader() {
     function finish() {
       clearInterval(timer);
       progressBar.style.width = '100%';
+      progressBar.removeAttribute('aria-valuenow');
+      document.body.removeAttribute('aria-busy');
       preloader.classList.add('fade-out');
       preloader.addEventListener(
         'transitionend',
@@ -50,6 +55,7 @@ export async function initPreloader() {
       progress = 100;
     }
     progressBar.style.width = `${progress}%`;
+    progressBar.setAttribute('aria-valuenow', String(Math.round(progress)));
     if (progress >= 100) {
       finish();
     }
@@ -59,6 +65,7 @@ export async function initPreloader() {
     loaded += 1;
     if (loaded === total) {
       progressBar.style.width = '100%';
+      progressBar.setAttribute('aria-valuenow', '100');
     }
   };
 
