@@ -48,9 +48,18 @@ export async function initPreloader() {
 
   const duration = 3000;
   const start = Date.now();
-  const images = Array.from(document.images);
+
+  const isPlaceholder = (img) =>
+    img.src.startsWith('data:') &&
+    img.naturalWidth <= 1 &&
+    img.naturalHeight <= 1;
+
+  const images = Array.from(document.images).filter((img) => !isPlaceholder(img));
+  const lazyImages = Array.from(document.querySelectorAll('img[data-src]')).filter(
+    (img) => isPlaceholder(img),
+  );
   let loaded = images.filter((img) => img.complete).length;
-  const total = images.length;
+  let total = images.length;
   const tracked = [];
 
   return new Promise((resolve) => {
@@ -76,6 +85,25 @@ export async function initPreloader() {
       );
     }
 
+  function trackImage(img) {
+    if (img.complete) {
+      return;
+    }
+    const handler = () => {
+      loaded += 1;
+      if (loaded === total && !reduceMotion) {
+        progressBar.style.width = '100%';
+        progressBar.setAttribute('aria-valuenow', '100');
+        if (progressText) progressText.textContent = '100%';
+      }
+      img.removeEventListener('load', handler);
+      img.removeEventListener('error', handler);
+    };
+    tracked.push({ img, handler });
+    img.addEventListener('load', handler);
+    img.addEventListener('error', handler);
+  }
+
   const timer = setInterval(() => {
     const elapsed = Date.now() - start;
     if (reduceMotion) {
@@ -97,19 +125,28 @@ export async function initPreloader() {
   }, 50);
 
   images.forEach((img) => {
-    if (!img.complete) {
-      const handler = () => {
-        loaded += 1;
-        if (loaded === total && !reduceMotion) {
-          progressBar.style.width = '100%';
-          progressBar.setAttribute('aria-valuenow', '100');
-          if (progressText) progressText.textContent = '100%';
-        }
-      };
-      tracked.push({ img, handler });
-      img.addEventListener('load', handler);
-      img.addEventListener('error', handler);
-    }
+    if (!img.complete) trackImage(img);
   });
+
+  if (lazyImages.length) {
+    const mo = new MutationObserver((mutations) => {
+      mutations.forEach((m) => {
+        if (m.type === 'attributes' && m.attributeName === 'src') {
+          const img = m.target;
+          if (!isPlaceholder(img)) {
+            total += 1;
+            if (img.complete) {
+              loaded += 1;
+            } else {
+              trackImage(img);
+            }
+          }
+        }
+      });
+    });
+    lazyImages.forEach((img) =>
+      mo.observe(img, { attributes: true, attributeFilter: ['src'] }),
+    );
+  }
   });
 }
