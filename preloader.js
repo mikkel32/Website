@@ -196,13 +196,19 @@ export async function initPreloader(options = {}) {
         const fontHandler = () => {
           loaded += 1;
           updateProgress();
-          document.fonts.removeEventListener('loadingdone', fontHandler);
-          document.fonts.removeEventListener('loadingerror', fontHandler);
+          if ('onloadingdone' in document.fonts) {
+            document.fonts.removeEventListener('loadingdone', fontHandler);
+            document.fonts.removeEventListener('loadingerror', fontHandler);
+          }
           maybeFinish();
         };
-        document.fonts.addEventListener('loadingdone', fontHandler);
-        document.fonts.addEventListener('loadingerror', fontHandler);
-        tracked.set(document.fonts, fontHandler);
+        if ('onloadingdone' in document.fonts) {
+          document.fonts.addEventListener('loadingdone', fontHandler);
+          document.fonts.addEventListener('loadingerror', fontHandler);
+          tracked.set(document.fonts, fontHandler);
+        } else if (document.fonts.ready) {
+          document.fonts.ready.then(fontHandler, fontHandler);
+        }
       }
     }
 
