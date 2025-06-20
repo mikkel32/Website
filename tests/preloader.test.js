@@ -167,6 +167,16 @@ describe('initPreloader', () => {
     const { initPreloader } = await import('../preloader.js');
     window.matchMedia = jest.fn().mockReturnValue({ matches: true });
 
+    let resolveFonts;
+    document.fonts = {
+      status: 'loading',
+      ready: new Promise((res) => {
+        resolveFonts = res;
+      }),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    };
+
     document.body.innerHTML = `
       <div id="preloader" aria-hidden="true">
         <svg class="preloader-shield"></svg>
@@ -202,17 +212,25 @@ describe('initPreloader', () => {
     await Promise.resolve();
 
     base.dispatchEvent(new Event('load'));
-    expect(parseFloat(progressBar.style.width)).toBeCloseTo(33.33, 1);
+    expect(parseFloat(progressBar.style.width)).toBeCloseTo(25, 1);
 
     lazy.dispatchEvent(new Event('load'));
-    expect(parseFloat(progressBar.style.width)).toBeCloseTo(66.66, 1);
+    expect(parseFloat(progressBar.style.width)).toBeCloseTo(50, 1);
 
     font.dispatchEvent(new Event('load'));
+    expect(parseFloat(progressBar.style.width)).toBeCloseTo(75, 1);
+
+    resolveFonts();
+    await Promise.resolve();
     expect(progressBar.style.width).toBe('100%');
+
+    expect(document.fonts.addEventListener).not.toHaveBeenCalled();
 
     const preloader = document.getElementById('preloader');
     preloader.dispatchEvent(new Event('transitionend'));
     await preloadPromise;
+
+    delete document.fonts;
   });
 
   test('tracks images added after initialization with src set', async () => {
