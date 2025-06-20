@@ -273,13 +273,14 @@ section {
 
 .hero-animation {
   position: absolute;
-  right: 10%;
+  left: 50%;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
+  width: clamp(150px, 30vw, 300px);
 }
 
 .shield-animation {
-  font-size: 15rem;
+  font-size: clamp(8rem, 20vw, 15rem);
   color: rgb(255 255 255 / 10%);
   animation: float 6s ease-in-out infinite;
 }
@@ -842,6 +843,8 @@ body.dark-mode .scroll-orb {
   height: 64px;
   fill: var(--primary-color);
   filter: drop-shadow(var(--shadow-glow));
+  margin: 0 auto;
+  display: block;
 }
 
 .preloader-progress {
