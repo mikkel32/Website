@@ -27,6 +27,7 @@ except Exception:  # ImportError or other issues
     pysass = None
 
 ROOT_DIR = Path(__file__).parent
+os.environ.setdefault("NODE_ENV", "development")
 
 CSRF_TOKENS: dict[str, float] = {}
 TOKEN_TTL = 600  # seconds
