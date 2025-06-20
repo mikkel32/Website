@@ -31,13 +31,20 @@ class Preloader {
     });
   }
 
-  preloadResource(href) {
+  preloadResource(href, crossOrigin = '') {
     if (!href || this.preloadMap.has(href) || typeof fetch !== 'function') return;
-    const p = fetch(href, {
-      cache: 'force-cache',
-      mode: 'no-cors',
-      credentials: 'same-origin',
-    }).catch(() => {});
+    const url = new URL(href, window.location.href);
+    const sameOrigin = url.origin === window.location.origin;
+    const opts = { cache: 'force-cache' };
+    opts.mode = sameOrigin ? 'no-cors' : 'cors';
+    if (crossOrigin === 'use-credentials') {
+      opts.credentials = 'include';
+    } else if (crossOrigin === 'anonymous') {
+      opts.credentials = 'omit';
+    } else {
+      opts.credentials = 'same-origin';
+    }
+    const p = fetch(url.href, opts).catch(() => {});
     this.preloadMap.set(href, p);
     this.trackPromise(p);
   }
@@ -142,8 +149,12 @@ class Preloader {
           if (as === 'font') {
             this.trackElement(el);
           } else {
-            this.preloadResource(el.href);
+            this.preloadResource(el.href, el.crossOrigin);
           }
+        } else if (el.tagName === 'LINK' && el.rel === 'stylesheet') {
+          this.trackElement(el, el.sheet !== null);
+        } else if (el.tagName === 'LINK' && el.rel === 'modulepreload') {
+          this.preloadResource(el.href, el.crossOrigin);
         }
       }
     };
@@ -220,7 +231,7 @@ class Preloader {
       if (as === 'font') {
         this.trackElement(link);
       } else {
-        this.preloadResource(href);
+        this.preloadResource(href, link.crossOrigin);
       }
     });
 
@@ -277,13 +288,13 @@ class Preloader {
   prefetchModules() {
     document.querySelectorAll('link[rel="modulepreload"]').forEach((link) => {
       if (link.href) {
-        import(link.href).catch(() => {});
+        this.preloadResource(link.href, link.crossOrigin);
       }
     });
     document.querySelectorAll('script[data-preload-module]').forEach((s) => {
       const src = s.dataset.src || s.src;
       if (src) {
-        import(src).catch(() => {});
+        this.preloadResource(src, s.crossOrigin);
       }
     });
   }
