@@ -1,4 +1,3 @@
-import { jest } from '@jest/globals';
 import { initSearch } from '../search.js';
 
 describe('search overlay keyboard and mouse interactions', () => {

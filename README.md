@@ -147,6 +147,14 @@ Run `npm run update-chart` anytime you want to refresh the bundled file with the
 
 Run `npm run update-anime` to refresh the bundled Anime.js file used as a fallback by the hero animations. Pass a version number to retrieve that release, e.g. `npm run update-anime 4.0.2`. The script downloads the chosen version from jsDelivr and writes it to `anime.bundle.mjs` and `public/anime.bundle.mjs`.
 
+## Updating the service worker
+
+The service worker defined in `service-worker.js` caches core assets like `main.css`,
+`main.js`, icon fonts, and the bundled modules. Whenever you add new resources or
+want to bust the cache, update the `ASSETS` list in the file and bump the
+`CACHE_NAME` version. Reload the page after rebuilding to ensure clients receive
+the latest service worker.
+
 
 
 ## Security auditing
