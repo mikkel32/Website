@@ -83,7 +83,7 @@ class SecureHandler(SimpleHTTPRequestHandler):
     """HTTP handler that injects security headers for every response."""
 
     rate_limiter = RateLimiter(
-        int(os.environ.get("MAX_REQUESTS", "20")),
+        int(os.environ.get("MAX_REQUESTS", "60")),
         int(os.environ.get("RATE_WINDOW", "1")),
     )
 
@@ -330,7 +330,7 @@ def main() -> None:
     if not compile_scss():
         print("Error: failed to compile SCSS. Aborting server startup.")
         sys.exit(1)
-    limit = int(os.environ.get("MAX_REQUESTS", "20"))
+    limit = int(os.environ.get("MAX_REQUESTS", "60"))
     window = int(os.environ.get("RATE_WINDOW", "1"))
     SecureHandler.rate_limiter = RateLimiter(limit, window)
     port = int(os.environ.get("PORT", _find_free_port()))
