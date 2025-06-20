@@ -176,7 +176,17 @@ section {
   font-size: 1.5rem;
   color: rgb(255 255 255 / 90%);
   margin-bottom: 2rem;
-  animation: fade-in-up 0.8s ease 0.2s both;
+  opacity: 0;
+  &.typing::after {
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 1em;
+    margin-left: 0.1em;
+    background: currentColor;
+    vertical-align: bottom;
+    animation: blink-cursor 1s steps(2, start) infinite;
+  }
 }
 
 .hero-buttons {
@@ -678,6 +688,16 @@ body.dark-mode .scroll-orb {
 
   50% {
     transform: translateY(-50%) translateX(20px);
+  }
+}
+
+@keyframes blink-cursor {
+  0%, 50% {
+    opacity: 1;
+  }
+
+  50.01%, 100% {
+    opacity: 0;
   }
 }
 
