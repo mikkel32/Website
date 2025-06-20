@@ -90,7 +90,7 @@ class SecureHandler(SimpleHTTPRequestHandler):
     # ``{nonce}`` placeholder to automatically inject a per-request nonce.
     csp_template = os.environ.get(
         "CONTENT_SECURITY_POLICY",
-        "default-src 'self'; img-src 'self' data: https://images.unsplash.com; script-src 'self' blob: https://cdn.jsdelivr.net {nonce}; style-src 'self'",
+        "default-src 'self'; img-src 'self' data: https://images.unsplash.com; script-src 'self' blob: https://cdn.jsdelivr.net {nonce}; style-src 'self'; connect-src 'self' https://cdn.jsdelivr.net",
     )
 
     def end_headers(self) -> None:  # type: ignore[override]
