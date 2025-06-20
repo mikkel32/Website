@@ -1,17 +1,12 @@
+import { getAnime } from './anime-loader.js';
+
 export async function initPreloader() {
   let animate;
   if (typeof process !== 'undefined' && process.env.JEST_WORKER_ID) {
     animate = () => {};
   } else {
-    try {
-      const mod = await import('animejs');
-      animate = mod.animate || mod.default;
-    } catch {
-      const fallback = await import(
-        'https://cdn.jsdelivr.net/npm/animejs@4.0.2/lib/anime.esm.js'
-      );
-      animate = fallback.animate || fallback.default;
-    }
+    const mod = await getAnime();
+    animate = mod?.animate || mod?.default || (() => {});
   }
   const preloader = document.getElementById('preloader');
   if (!preloader) return Promise.resolve();
@@ -19,8 +14,7 @@ export async function initPreloader() {
   const shield = preloader.querySelector('.preloader-shield');
   const progressBar = preloader.querySelector('.progress-bar');
 
-  animate({
-    targets: shield,
+  animate(shield, {
     rotate: '360deg',
     duration: 1000,
     easing: 'linear',
