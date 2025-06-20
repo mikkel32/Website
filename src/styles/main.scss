@@ -882,7 +882,7 @@ body.dark-mode .scroll-orb {
   position: relative;
   width: 80%;
   max-width: 300px;
-  height: 8px;
+  height: 12px;
   margin-top: 1.5rem;
   border-radius: var(--radius-md);
   background: var(--border-light);
@@ -900,9 +900,11 @@ body.dark-mode .scroll-orb {
 
 .preloader-progress .progress-text {
   position: absolute;
-  top: -1.5rem;
-  right: 0;
-  font-size: 0.75rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -150%);
+  font-size: 0.875rem;
+  font-weight: 500;
   color: var(--text-color);
 }
 

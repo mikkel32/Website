@@ -21,6 +21,17 @@ class Preloader {
     this.createTimeline = () => ({ add: () => {}, finished: Promise.resolve() });
   }
 
+  insertPreloadLink(href, as, crossOrigin = '') {
+    if (!href || this.preloadMap.has(href)) return;
+    const link = document.createElement('link');
+    link.rel = as === 'fetch' ? 'prefetch' : 'preload';
+    link.href = href;
+    if (as && as !== 'fetch') link.as = as;
+    if (crossOrigin) link.crossOrigin = crossOrigin;
+    document.head.appendChild(link);
+    this.preloadMap.set(href, Promise.resolve());
+  }
+
   trackPromise(promise) {
     if (this.assets.has(promise)) return;
     this.assets.add(promise);
@@ -31,22 +42,24 @@ class Preloader {
     });
   }
 
-  preloadResource(href, crossOrigin = '') {
-    if (!href || this.preloadMap.has(href) || typeof fetch !== 'function') return;
-    const url = new URL(href, window.location.href);
-    const sameOrigin = url.origin === window.location.origin;
-    const opts = { cache: 'force-cache' };
-    opts.mode = sameOrigin ? 'no-cors' : 'cors';
-    if (crossOrigin === 'use-credentials') {
-      opts.credentials = 'include';
-    } else if (crossOrigin === 'anonymous') {
-      opts.credentials = 'omit';
-    } else {
-      opts.credentials = 'same-origin';
+  preloadResource(href, crossOrigin = '', as = '') {
+    if (!href || this.preloadMap.has(href)) return;
+    if (typeof fetch === 'function') {
+      const url = new URL(href, window.location.href);
+      const sameOrigin = url.origin === window.location.origin;
+      const opts = { cache: 'force-cache' };
+      opts.mode = sameOrigin ? 'no-cors' : 'cors';
+      if (crossOrigin === 'use-credentials') {
+        opts.credentials = 'include';
+      } else if (crossOrigin === 'anonymous') {
+        opts.credentials = 'omit';
+      } else {
+        opts.credentials = 'same-origin';
+      }
+      fetch(url.href, opts).catch(() => {});
     }
-    const p = fetch(url.href, opts).catch(() => {});
-    this.preloadMap.set(href, p);
-    this.trackPromise(p);
+    this.preloadMap.set(href, Promise.resolve());
+    this.insertPreloadLink(href, as, crossOrigin);
   }
 
   prefetchLazyImages() {
@@ -54,7 +67,7 @@ class Preloader {
       const src = img.dataset.src;
       if (src && !this.prefetched.has(src)) {
         this.prefetched.add(src);
-        this.preloadResource(src);
+        this.preloadResource(src, '', 'image');
       }
     });
   }
@@ -62,7 +75,7 @@ class Preloader {
   prefetchPages() {
     document.querySelectorAll('a[data-prefetch]').forEach((a) => {
       if (a.href) {
-        this.preloadResource(a.href);
+        this.preloadResource(a.href, '', 'fetch');
       }
     });
   }
@@ -149,10 +162,10 @@ class Preloader {
         }
       }
       if (el.dataset && el.dataset.src && el.classList.contains('lazy-image')) {
-        this.preloadResource(el.dataset.src);
+        this.preloadResource(el.dataset.src, '', 'image');
       }
       if (el.dataset && 'prefetch' in el.dataset && el.tagName === 'A' && el.href) {
-        this.preloadResource(el.href);
+        this.preloadResource(el.href, '', 'fetch');
       }
       if (el.hasAttribute && el.hasAttribute('href')) {
         if (el.tagName === 'LINK' && el.rel === 'preload') {
@@ -160,12 +173,12 @@ class Preloader {
           if (as === 'font') {
             this.trackElement(el);
           } else {
-            this.preloadResource(el.href, el.crossOrigin);
+            this.preloadResource(el.href, el.crossOrigin, as);
           }
         } else if (el.tagName === 'LINK' && el.rel === 'stylesheet') {
           this.trackElement(el, el.sheet !== null);
         } else if (el.tagName === 'LINK' && el.rel === 'modulepreload') {
-          this.preloadResource(el.href, el.crossOrigin);
+          this.preloadResource(el.href, el.crossOrigin, 'script');
         }
       }
     };
@@ -194,12 +207,14 @@ class Preloader {
 
   trackInitialAssets() {
     this.preloadFonts().forEach((p) => this.trackPromise(p));
-
     this.prefetchLazyImages();
     this.prefetchPages();
 
     const images = Array.from(document.images).filter((img) => !this.isPlaceholder(img));
-    images.forEach((img) => this.trackElement(img, img.complete));
+    images.forEach((img) => {
+      this.trackElement(img, img.complete);
+      this.insertPreloadLink(img.src, 'image');
+    });
 
     Array.from(document.querySelectorAll('script[src]')).forEach((s) => {
       this.trackElement(s, s.readyState === 'complete' || s.readyState === 'loaded');
@@ -243,7 +258,7 @@ class Preloader {
       if (as === 'font') {
         this.trackElement(link);
       } else {
-        this.preloadResource(href, link.crossOrigin);
+        this.preloadResource(href, link.crossOrigin, as || 'script');
       }
     });
 
@@ -300,13 +315,13 @@ class Preloader {
   prefetchModules() {
     document.querySelectorAll('link[rel="modulepreload"]').forEach((link) => {
       if (link.href) {
-        this.preloadResource(link.href, link.crossOrigin);
+        this.preloadResource(link.href, link.crossOrigin, 'script');
       }
     });
     document.querySelectorAll('script[data-preload-module]').forEach((s) => {
       const src = s.dataset.src || s.src;
       if (src) {
-        this.preloadResource(src, s.crossOrigin);
+        this.preloadResource(src, s.crossOrigin, 'script');
       }
     });
   }
