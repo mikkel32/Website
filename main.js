@@ -15,6 +15,7 @@ import { initHeroAnimations } from './hero-animations.js';
 import { initScrollOrb } from './scroll-orb.js';
 import { initParallax } from './parallax.js';
 import { initPreloader } from './preloader.js';
+import { initScrollTopButton } from './scroll-top.js';
 
 export function setupLinkTransitions() {
   const reset = () => document.body.classList.remove('page-exit');
@@ -166,22 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  const scrollTopBtn = document.createElement('button');
-  scrollTopBtn.className = 'scroll-top';
-  scrollTopBtn.innerHTML = '<i class="fas fa-arrow-up"></i>';
-  document.body.appendChild(scrollTopBtn);
-
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 500) {
-      scrollTopBtn.classList.add('active');
-    } else {
-      scrollTopBtn.classList.remove('active');
-    }
-  });
-
-  scrollTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  initScrollTopButton();
 
 
   const notifications = new NotificationSystem();
