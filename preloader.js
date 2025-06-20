@@ -74,6 +74,7 @@ export async function initPreloader(options = {}) {
   }
 
   function track(el, alreadyLoaded = false) {
+    if (assets.includes(el)) return;
     assets.push(el);
     const handler = () => {
       loaded += 1;
@@ -126,27 +127,35 @@ export async function initPreloader(options = {}) {
     const images = Array.from(document.images).filter((img) => !isPlaceholder(img));
     images.forEach((img) => track(img, img.complete));
 
-    const lazyImages = Array.from(document.querySelectorAll('img[data-src]')).filter((img) => isPlaceholder(img));
-    if (lazyImages.length) {
-      const mo = new MutationObserver((mutations) => {
-        mutations.forEach((m) => {
-          if (m.type === 'attributes' && m.attributeName === 'src') {
-            const img = m.target;
-            if (!isPlaceholder(img)) {
-              track(img, img.complete);
-            }
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((m) => {
+        if (m.type !== 'attributes') return;
+        const el = m.target;
+        if (m.attributeName === 'src') {
+          if (el.tagName === 'IMG' && !isPlaceholder(el)) {
+            track(el, el.complete);
+          } else if (el.tagName === 'SCRIPT' && typeof el.dataset.src !== 'undefined') {
+            track(el, el.readyState === 'complete' || el.readyState === 'loaded');
           }
-        });
+        } else if (m.attributeName === 'href') {
+          if (el.tagName === 'LINK' && el.rel === 'preload' && el.getAttribute('as') === 'font') {
+            track(el);
+          }
+        }
       });
-      lazyImages.forEach((img) => mo.observe(img, { attributes: true, attributeFilter: ['src'] }));
-    }
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ['src', 'href'],
+    });
 
     Array.from(document.querySelectorAll('script[src]')).forEach((s) => {
       track(s, s.readyState === 'complete' || s.readyState === 'loaded');
     });
 
     Array.from(document.querySelectorAll('link[rel="stylesheet"]')).forEach((l) => {
-      track(l, l.sheet != null);
+      track(l, l.sheet !== null);
     });
 
     if (document.fonts) {
