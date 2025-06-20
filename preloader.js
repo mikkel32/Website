@@ -68,12 +68,28 @@ export async function initPreloader(options = {}) {
   let resolveFn;
   let observer;
 
+  function trackPromise(p) {
+    if (assets.has(p)) return;
+    assets.add(p);
+    p.finally(() => {
+      loaded += 1;
+      updateProgress();
+      maybeFinish();
+    });
+  }
+
   function updateProgress() {
     const total = assets.size;
     const progress = total ? Math.min(100, (loaded / total) * 100) : 100;
     progressBar.style.width = `${progress}%`;
     progressBar.setAttribute('aria-valuenow', String(Math.round(progress)));
     if (progressText) progressText.textContent = `${Math.round(progress)}%`;
+  }
+
+  function preloadFonts() {
+    if (!document.fonts || typeof document.fonts.load !== 'function') return [];
+    const families = ['Poppins', 'Font Awesome 6 Free', 'Font Awesome 6 Brands'];
+    return families.map((f) => document.fonts.load(`1em ${f}`));
   }
 
   function maybeFinish() {
@@ -135,6 +151,8 @@ export async function initPreloader(options = {}) {
 
   return new Promise((resolve) => {
     resolveFn = resolve;
+
+    preloadFonts().forEach((p) => trackPromise(p));
 
     const images = Array.from(document.images).filter((img) => !isPlaceholder(img));
     images.forEach((img) => track(img, img.complete));
