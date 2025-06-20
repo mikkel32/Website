@@ -8,8 +8,13 @@
   <script type="importmap" src="importmap.json"></script>
 </head>
 <body class="no-scroll">
-  <div id="preloader">
-    <div class="loading-spinner"></div>
+  <div id="preloader" aria-hidden="true">
+    <svg class="preloader-shield" viewBox="0 0 24 24">
+      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+    </svg>
+    <div class="preloader-progress">
+      <div class="progress-bar"></div>
+    </div>
   </div>
   <noscript>
     <style>#preloader{display:none!important}</style>
