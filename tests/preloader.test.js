@@ -168,6 +168,8 @@ describe('initPreloader', () => {
     const { initPreloader } = await import('../preloader.js');
     window.matchMedia = jest.fn().mockReturnValue({ matches: true });
 
+    document.head.innerHTML = '';
+
     let resolveFonts;
     document.fonts = {
       status: 'loading',
@@ -243,6 +245,9 @@ describe('initPreloader', () => {
     const { initPreloader } = await import('../preloader.js');
     window.matchMedia = jest.fn().mockReturnValue({ matches: true });
 
+    delete document.fonts;
+    document.head.innerHTML = '';
+
     document.body.innerHTML = `
       <div id="preloader" aria-hidden="true">
         <svg class="preloader-shield"></svg>
@@ -274,6 +279,99 @@ describe('initPreloader', () => {
     dynamic.dispatchEvent(new Event('load'));
 
     expect(progressBar.style.width).toBe('100%');
+
+    const preloader = document.getElementById('preloader');
+    preloader.dispatchEvent(new Event('transitionend'));
+    await preloadPromise;
+  });
+
+  test('preloads resources from link preload tags', async () => {
+    jest.resetModules();
+    const animate = jest.fn(() => ({ finished: Promise.resolve() }));
+    const timeline = { add: jest.fn(), finished: Promise.resolve() };
+    const createTimeline = jest.fn(() => timeline);
+    jest.unstable_mockModule('../anime-loader.js', () => ({ getAnime: () => Promise.resolve({ animate, createTimeline }) }));
+    const { initPreloader } = await import('../preloader.js');
+    window.matchMedia = jest.fn().mockReturnValue({ matches: true });
+
+    delete document.fonts;
+    document.head.innerHTML = '';
+
+    global.fetch = jest.fn(() => Promise.resolve({}));
+
+    document.body.innerHTML = `
+      <div id="preloader" aria-hidden="true">
+        <svg class="preloader-shield"></svg>
+        <div class="preloader-progress">
+          <div class="progress-bar"></div>
+          <span class="progress-text" aria-live="polite"></span>
+        </div>
+      </div>`;
+
+    const linkStyle = document.createElement('link');
+    linkStyle.rel = 'preload';
+    linkStyle.setAttribute('as', 'style');
+    linkStyle.href = 'foo.css';
+    document.head.appendChild(linkStyle);
+
+    const linkScript = document.createElement('link');
+    linkScript.rel = 'preload';
+    linkScript.setAttribute('as', 'script');
+    linkScript.href = 'bar.js';
+    document.head.appendChild(linkScript);
+
+    jest.useFakeTimers();
+    const preloadPromise = initPreloader({ timeout: 1000 });
+    await Promise.resolve();
+
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('foo.css'));
+    expect(fetch).toHaveBeenCalledWith(expect.stringContaining('bar.js'));
+
+    jest.runAllTimers();
+    const preloader = document.getElementById('preloader');
+    preloader.dispatchEvent(new Event('transitionend'));
+    await preloadPromise;
+    delete global.fetch;
+  });
+
+  test('tracks font preload links added dynamically', async () => {
+    jest.resetModules();
+    jest.setTimeout(10000);
+    const animate = jest.fn(() => ({ finished: Promise.resolve() }));
+    const timeline = { add: jest.fn(), finished: Promise.resolve() };
+    const createTimeline = jest.fn(() => timeline);
+    jest.unstable_mockModule('../anime-loader.js', () => ({ getAnime: () => Promise.resolve({ animate, createTimeline }) }));
+    const { initPreloader } = await import('../preloader.js');
+    window.matchMedia = jest.fn().mockReturnValue({ matches: true });
+
+    delete document.fonts;
+    document.head.innerHTML = '';
+
+    document.body.innerHTML = `
+      <div id="preloader" aria-hidden="true">
+        <svg class="preloader-shield"></svg>
+        <div class="preloader-progress">
+          <div class="progress-bar"></div>
+          <span class="progress-text" aria-live="polite"></span>
+        </div>
+      </div>`;
+
+    const img = document.createElement('img');
+    img.src = 'a.jpg';
+    document.body.appendChild(img);
+
+    jest.useFakeTimers();
+    const preloadPromise = initPreloader({ timeout: 1000 });
+    await Promise.resolve();
+
+    const linkFont = document.createElement('link');
+    linkFont.rel = 'preload';
+    linkFont.setAttribute('as', 'font');
+    linkFont.href = 'font.woff2';
+    document.head.appendChild(linkFont);
+    await Promise.resolve();
+    linkFont.dispatchEvent(new Event('load'));
+    img.dispatchEvent(new Event('load'));
 
     const preloader = document.getElementById('preloader');
     preloader.dispatchEvent(new Event('transitionend'));
