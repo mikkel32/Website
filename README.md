@@ -130,8 +130,6 @@ Chart.js powering the network activity visualization is loaded on demand when th
 
 Run `npm run update-chart` anytime you want to refresh the bundled file with the latest Chart.js version. The script uses `curl` to download `?bundle` from esm.sh and writes it to both `dashboard/chart.bundle.mjs` and `public/dashboard/chart.bundle.mjs`.
 
-Anime.js powering the hero animations and preloader is bundled in the same way. `npm run update-anime` downloads the ES module build from jsDelivr and saves it as `anime.bundle.mjs` (mirrored under `public/` for production). This local bundle is used whenever importing `animejs` fails, allowing the site to run without network access. If you override the Content Security Policy ensure the `connect-src` directive includes `https://cdn.jsdelivr.net` so the CDN fallback works when network access is available.
-
 
 
 ## Security auditing

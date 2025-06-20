@@ -13,8 +13,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
-    "update-chart": "node scripts/updateChartBundle.js",
-    "update-anime": "node scripts/updateAnimeBundle.js"
+    "update-chart": "node scripts/updateChartBundle.js"
   },
   "keywords": [],
   "author": "",
