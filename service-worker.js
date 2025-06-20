@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sg-cache-v1';
+const CACHE_NAME = 'sg-cache-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -6,8 +6,6 @@ const ASSETS = [
   '/main.js',
   '/anime.bundle.mjs',
   '/dashboard/chart.bundle.mjs',
-  '/public/anime.bundle.mjs',
-  '/public/dashboard/chart.bundle.mjs',
   '/node_modules/@fontsource/poppins/files/poppins-devanagari-400-normal.woff2',
   '/node_modules/@fontsource/poppins/files/poppins-latin-ext-400-normal.woff2',
   '/node_modules/@fontsource/poppins/files/poppins-latin-400-normal.woff2',
