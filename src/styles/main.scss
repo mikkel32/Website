@@ -176,7 +176,7 @@ section {
   font-size: 1.5rem;
   color: rgb(255 255 255 / 90%);
   margin-bottom: 2rem;
-  animation: fade-in-up 0.8s ease 0.2s both;
+  opacity: 0;
   &.typing::after {
     content: '';
     display: inline-block;

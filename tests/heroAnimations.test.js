@@ -9,10 +9,13 @@ describe('typeSubtitle', () => {
     const promise = typeSubtitle(el, 'Hey', 50);
     expect(el.textContent).toBe('');
     jest.advanceTimersByTime(50);
+    await Promise.resolve();
     expect(el.textContent).toBe('H');
     jest.advanceTimersByTime(50);
+    await Promise.resolve();
     expect(el.textContent).toBe('He');
     jest.advanceTimersByTime(50);
+    await Promise.resolve();
     expect(el.textContent).toBe('Hey');
     await promise;
     jest.useRealTimers();

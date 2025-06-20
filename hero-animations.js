@@ -2,21 +2,15 @@
 // when served by a simple HTTP server without a bundler.
 let animeModule;
 
-export function typeSubtitle(element, text, interval = 50) {
-  return new Promise((resolve) => {
-    let i = 0;
-    element.textContent = '';
-    element.classList.add('typing');
-    const id = setInterval(() => {
-      element.textContent += text[i];
-      i += 1;
-      if (i >= text.length) {
-        clearInterval(id);
-        element.classList.remove('typing');
-        resolve();
-      }
-    }, interval);
-  });
+export async function typeSubtitle(element, text, interval = 50) {
+  element.textContent = '';
+  element.classList.add('typing');
+  for (const char of text) {
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((r) => setTimeout(r, interval));
+    element.textContent += char;
+  }
+  element.classList.remove('typing');
 }
 
 const CDN_URL =
@@ -90,11 +84,6 @@ export async function initHeroAnimations() {
     translateY: [40, 0],
   })
     .add({
-      targets: '.hero-subtitle',
-      opacity: [0, 1],
-      translateY: [40, 0],
-    }, '-=400')
-    .add({
       targets: '.hero-buttons .btn',
       opacity: [0, 1],
       translateY: [40, 0],
@@ -133,6 +122,12 @@ export async function initHeroAnimations() {
 
   if (subtitleEl) {
     await tl.finished;
+    await animate(subtitleEl, {
+      opacity: [0, 1],
+      translateY: [40, 0],
+      duration: 600,
+      easing: 'easeOutCubic',
+    }).finished;
     await typeSubtitle(subtitleEl, subtitleText, 75);
   }
 }
