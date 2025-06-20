@@ -157,4 +157,61 @@ describe('initPreloader', () => {
     jest.useRealTimers();
     expect(createTimeline).toHaveBeenCalled();
   });
+
+  test('tracks font preloads and dynamic images', async () => {
+    jest.resetModules();
+    const animate = jest.fn(() => ({ finished: Promise.resolve() }));
+    const timeline = { add: jest.fn(), finished: Promise.resolve() };
+    const createTimeline = jest.fn(() => timeline);
+    jest.unstable_mockModule('../anime-loader.js', () => ({ getAnime: () => Promise.resolve({ animate, createTimeline }) }));
+    const { initPreloader } = await import('../preloader.js');
+    window.matchMedia = jest.fn().mockReturnValue({ matches: true });
+
+    document.body.innerHTML = `
+      <div id="preloader" aria-hidden="true">
+        <svg class="preloader-shield"></svg>
+        <div class="preloader-progress">
+          <div class="progress-bar"></div>
+          <span class="progress-text" aria-live="polite"></span>
+        </div>
+      </div>`;
+
+    const base = document.createElement('img');
+    base.src = 'x';
+    document.body.appendChild(base);
+
+    const lazy = document.createElement('img');
+    lazy.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+    lazy.setAttribute('data-src', 'foo.jpg');
+    document.body.appendChild(lazy);
+
+    const font = document.createElement('link');
+    font.rel = 'preload';
+    font.setAttribute('as', 'font');
+    document.head.appendChild(font);
+
+    jest.useFakeTimers();
+    const preloadPromise = initPreloader({ timeout: 1000 });
+    await Promise.resolve();
+
+    const progressBar = document.querySelector('.progress-bar');
+    expect(progressBar.style.width).toBe('0%');
+
+    font.href = 'font.woff2';
+    lazy.src = 'foo.jpg';
+    await Promise.resolve();
+
+    base.dispatchEvent(new Event('load'));
+    expect(parseFloat(progressBar.style.width)).toBeCloseTo(33.33, 1);
+
+    lazy.dispatchEvent(new Event('load'));
+    expect(parseFloat(progressBar.style.width)).toBeCloseTo(66.66, 1);
+
+    font.dispatchEvent(new Event('load'));
+    expect(progressBar.style.width).toBe('100%');
+
+    const preloader = document.getElementById('preloader');
+    preloader.dispatchEvent(new Event('transitionend'));
+    await preloadPromise;
+  });
 });
