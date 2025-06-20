@@ -3,7 +3,7 @@ import { jest } from '@jest/globals';
 describe('initPreloader', () => {
   test('removes preloader after images load', async () => {
     jest.resetModules();
-    jest.unstable_mockModule('animejs', () => ({ default: jest.fn() }));
+    jest.unstable_mockModule('animejs', () => ({ animate: jest.fn() }));
     const { initPreloader } = await import('../preloader.js');
 
     document.body.innerHTML = `

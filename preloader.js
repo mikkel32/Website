@@ -1,16 +1,16 @@
 export async function initPreloader() {
-  let anime;
+  let animate;
   if (typeof process !== 'undefined' && process.env.JEST_WORKER_ID) {
-    anime = () => {};
+    animate = () => {};
   } else {
     try {
       const mod = await import('animejs');
-      anime = mod.default;
+      animate = mod.animate || mod.default;
     } catch {
       const fallback = await import(
         'https://cdn.jsdelivr.net/npm/animejs@4.0.2/lib/anime.esm.js'
       );
-      anime = fallback.default;
+      animate = fallback.animate || fallback.default;
     }
   }
   const preloader = document.getElementById('preloader');
@@ -19,7 +19,7 @@ export async function initPreloader() {
   const shield = preloader.querySelector('.preloader-shield');
   const progressBar = preloader.querySelector('.progress-bar');
 
-  anime({
+  animate({
     targets: shield,
     rotate: '360deg',
     duration: 1000,
