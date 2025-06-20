@@ -48,13 +48,15 @@ export async function initPreloader(options = {}) {
         loop: true,
       });
     });
-  } else {
+  } else if (!reduceMotion) {
     shield.style.opacity = '0';
     shield.style.transition = 'opacity 0.4s linear';
     requestAnimationFrame(() => {
       shield.style.opacity = '1';
     });
     progressBar.style.transition = 'none';
+  } else {
+    shield.style.opacity = '1';
   }
 
   const isPlaceholder = (img) =>

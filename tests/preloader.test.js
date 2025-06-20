@@ -110,7 +110,8 @@ describe('initPreloader', () => {
     await preloaderPromise;
 
     expect(progressText.textContent).toBe('100%');
-    expect(shield.style.transition).toBe('opacity 0.4s linear');
+    expect(shield.style.transition).toBe('');
+    expect(progressBar.style.transition).toBe('');
     expect(shield.style.opacity).toBe('1');
     expect(createTimeline).not.toHaveBeenCalled();
     expect(timeline.add).not.toHaveBeenCalled();
